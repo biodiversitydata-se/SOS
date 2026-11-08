@@ -43,6 +43,8 @@ const locationOverlays = [
 const pointStylesByLocationDisplayStatus = new Map();
 const polygonStylesByLocationDisplayStatus = new Map();
 const geoGridStylesByColor = new Map();
+const highlightedPointStylesByRadius = new Map();
+let highlightedPolygonStyle = null;
 let highlightedLocationIds = new Set();
 let highlightedFeatureIds = new Set();
 let previouslyHighlightedMapFeatures = [];
@@ -635,12 +637,16 @@ function createOwnFilterAreaFeatures(reference, ownGeometries) {
         let geometry = normalizeFilterGeometry(original);
         if (searchCircle && reference.maxDistanceFromPoint > 0 && geometry.type === "Point") {
             const center = geometry.coordinates;
-            geometry = { type: "Polygon", coordinates: [openLayersMap.createGeodesicCircleCoordinates(
-                center[0], center[1], reference.maxDistanceFromPoint, "EPSG:4326")] };
+            geometry = {
+                type: "Polygon", coordinates: [openLayersMap.createGeodesicCircleCoordinates(
+                    center[0], center[1], reference.maxDistanceFromPoint, "EPSG:4326")]
+            };
         }
-        return { type: "Feature", geometry, properties: {
-            FeatureType: searchCircle ? "FilterArea.Polygon" : "FilterArea.OwnPolygon"
-        } };
+        return {
+            type: "Feature", geometry, properties: {
+                FeatureType: searchCircle ? "FilterArea.Polygon" : "FilterArea.OwnPolygon"
+            }
+        };
     });
 }
 
@@ -653,9 +659,11 @@ function replaceFilterAreaFeatures(features) {
     let layer = getLayerById(filterAreasLayerId);
     if (layer) layer.setSource(source);
     else {
-        layer = new ol.layer.Vector({ source, style: new ol.style.Style({
-            stroke: new ol.style.Stroke({ color: "#00695c", width: 2, lineDash: [6, 4] })
-        }) });
+        layer = new ol.layer.Vector({
+            source, style: new ol.style.Style({
+                stroke: new ol.style.Stroke({ color: "#00695c", width: 2, lineDash: [6, 4] })
+            })
+        });
         layer.set("id", filterAreasLayerId);
         layer.set("sosNonInteractive", true);
         layer.setZIndex(25);
@@ -720,7 +728,7 @@ export function updateFilterAreaLayer(references, filterJson) {
             console.error("LocationsSearch: failed to load filter area outlines", error);
             if (filterAreaFailedKey !== key) {
                 filterAreaFailedKey = key;
-                dotNetRef?.invokeMethodAsync("OnFilterAreaLoadFailedFromJs").catch(() => {});
+                dotNetRef?.invokeMethodAsync("OnFilterAreaLoadFailedFromJs").catch(() => { });
             }
         } finally {
             if (version === filterAreaVersion) filterAreaPending = null;
@@ -1088,7 +1096,7 @@ function getNextSelectedFeatures(features) {
         (mapSelection.locationIds.size > 0 || clicked.locationIds.size > 0
             ? sameIds(mapSelection.locationIds, clicked.locationIds)
             : mapSelection.featureIds.size === mapSelection.featureCount && clicked.featureIds.size === clicked.featureCount &&
-                sameIds(mapSelection.featureIds, clicked.featureIds));
+            sameIds(mapSelection.featureIds, clicked.featureIds));
     return sameSelection ? [] : features;
 }
 
@@ -1320,23 +1328,31 @@ function normalizeLocationId(value) {
 
 function getHighlightedLocationStyle(feature) {
     const geometryType = feature.getGeometry()?.getType();
-    if (geometryType === "Point" || geometryType === "MultiPoint") {
-        return new ol.style.Style({
+    if (geometryType !== "Point" && geometryType !== "MultiPoint") {
+        highlightedPolygonStyle ??= new ol.style.Style({
+            zIndex: 1000,
+            stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 }),
+            fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.18)" })
+        });
+        return highlightedPolygonStyle;
+    }
+
+    const radius = pointSizeMode !== "Fixed" && isLocationObservationFeature(feature)
+        ? getPointRadius(feature) + 2 : 7;
+    let style = highlightedPointStylesByRadius.get(radius);
+    if (!style) {
+        style = new ol.style.Style({
             zIndex: 1000,
             image: new ol.style.Circle({
-                radius: pointSizeMode !== "Fixed" && isLocationObservationFeature(feature)
-                    ? getPointRadius(feature) + 2 : 7,
+                radius,
                 fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.38)" }),
                 stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 })
             })
         });
+        highlightedPointStylesByRadius.set(radius, style);
     }
 
-    return new ol.style.Style({
-        zIndex: 1000,
-        stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 }),
-        fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.18)" })
-    });
+    return style;
 }
 
 function getObservationStyle(feature, context) {

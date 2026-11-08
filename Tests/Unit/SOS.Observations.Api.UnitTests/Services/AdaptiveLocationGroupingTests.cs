@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NetTopologySuite.Geometries;
 using SOS.Api.Contracts.Observations.Requests;
@@ -26,7 +26,7 @@ public class AdaptiveLocationGroupingTests
         summary.PresentationStatusSummaries.Add(new() { IsPresent = true, EndYear = 1990, Count = 100 });
         summary.PresentationStatusSummaries.Add(new() { IsPresent = true, EndYear = 2020, Count = 256 });
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions()).Single();
+        var feature = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions()).Single();
         var before = JsonSerializer.Serialize(LocationFeatureResponseMapper.ToProperties(feature, 2000));
         feature.ObservationSummary.Should().NotBeSameAs(summary);
         feature.ObservationSummary.FoundCount = 0;
@@ -35,7 +35,7 @@ public class AdaptiveLocationGroupingTests
         summary.FoundCount.Should().Be(356);
         summary.PresentationStatusSummaries.Should().HaveCount(2);
         summary.PresentationStatusSummaries[0].Count.Should().Be(100);
-        var again = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions()).Single();
+        var again = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions()).Single();
         JsonSerializer.Serialize(LocationFeatureResponseMapper.ToProperties(again, 2000)).Should().Be(before);
     }
 
@@ -44,13 +44,13 @@ public class AdaptiveLocationGroupingTests
     {
         var first = MakeAggregate(AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2);
         var a = await Write(MakeCluster(first));
-        first.LocationIds.Reverse();
+        first.Locations.Reverse();
         var b = await Write(MakeCluster(first));
         a.GetProperty("id").GetString().Should().Be(b.GetProperty("id").GetString());
-        for (var i = 0; i < first.LocationIds.Count; i++) first.LocationIds[i] = first.LocationIds[i].ToUpperInvariant();
+        foreach (var location in first.Locations) location.LocationId = location.LocationId.ToUpperInvariant();
         var c = await Write(MakeCluster(first));
         c.GetProperty("id").GetString().Should().Be(a.GetProperty("id").GetString());
-        first.LocationIds.Add("zz-extra-outside-items-limit");
+        first.Locations.Add(new Location { LocationId = "zz-extra-outside-items-limit", DecimalLongitude = 15, DecimalLatitude = 59 });
         var d = await Write(MakeCluster(first));
         d.GetProperty("id").GetString().Should().NotBe(a.GetProperty("id").GetString());
         a.GetProperty("id").GetString().Should().NotBeNullOrWhiteSpace();
@@ -63,7 +63,7 @@ public class AdaptiveLocationGroupingTests
     {
         var aggregate = MakeAggregate(7);
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
+        var feature = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
         var json = await Write(feature);
         json.GetProperty("id").GetString().Should().Be(aggregate.DistinctLocationId);
         var properties = json.GetProperty("properties");
@@ -84,7 +84,7 @@ public class AdaptiveLocationGroupingTests
             polygons[aggregate.Locations[i].LocationId] = new GeometryFactory().ToGeometry(new Envelope(15 + i * 0.01, 15.005 + i * 0.01, 59, 59.005));
         }
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = polygons, CreatePolygons = CreatePolygonsMode.Yes, MetersPerPixel = null }).Single();
+        var feature = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = polygons, CreatePolygons = CreatePolygonsMode.Yes, MetersPerPixel = null }).Single();
         var lastLocation = aggregate.Locations.OrderBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).Last();
         var lastIndex = aggregate.Locations.IndexOf(lastLocation);
         feature.Geometry!.Covers(new Point(15 + lastIndex * 0.01 + 0.002, 59.002)).Should().BeTrue();
@@ -102,7 +102,7 @@ public class AdaptiveLocationGroupingTests
         var lastLocation = aggregate.Locations.OrderBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).Last();
         lastLocation.CoordinateUncertaintyInMeters = 10000;
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
+        var feature = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
         feature.Geometry!.EnvelopeInternal.Width.Should().BeGreaterThan(0.1);
         var dto = LocationFeatureResponseMapper.ToProperties(feature);
         dto.Locations.Items.Should().HaveCount(AdaptiveSearchFeatureLocationsDto.MaxLocationItems)
@@ -118,7 +118,7 @@ public class AdaptiveLocationGroupingTests
         aggregate.ObservationSummary.DiffusedCount = 1;
         aggregate.Locations[6].CoordinateUncertaintyInMeters = 10000;
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
+        var feature = factory.CreateItems(new List<LocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
         var properties = LocationFeatureResponseMapper.ToProperties(feature);
         properties.Locations.Items.Should().OnlyContain(item => item.IsGeneralized == (item.LocationId == "site-6"));
         properties.ObservationSummary.StatusCounts!.DiffusedCount.Should().Be(1);
@@ -150,26 +150,34 @@ public class AdaptiveLocationGroupingTests
         items.Should().OnlyContain(item => !string.IsNullOrEmpty(item.GetProperty("locality").GetString()));
     }
 
-    private static LocationFeature MakeCluster(CachedLocationAggregate aggregate) => new()
+    private static LocationFeature MakeCluster(LocationAggregate aggregate) => new()
     {
-        IsCluster = true, GroupingType = LocationGroupingType.MeterCluster,
-        LocationIds = aggregate.LocationIds, OriginalLocations = aggregate.Locations,
-        Locations = new() { aggregate.Location }, Location = aggregate.Location,
-        Geometry = new Point(15, 59), ClusterRadiusMeters = 100
+        IsCluster = true,
+        GroupingType = LocationGroupingType.MeterCluster,
+        LocationIds = aggregate.LocationIds.ToList(),
+        OriginalLocations = aggregate.Locations,
+        Locations = new() { aggregate.Location },
+        Location = aggregate.Location,
+        Geometry = new Point(15, 59),
+        ClusterRadiusMeters = 100
     };
 
-    private static CachedLocationAggregate MakeAggregate(int count)
+    private static LocationAggregate MakeAggregate(int count)
     {
         var locations = Enumerable.Range(0, count).Select(i => new Location
         {
-            Type = SOS.Lib.Enums.LocationType.Point, LocationId = $"site-{i}",
-            DecimalLongitude = 15, DecimalLatitude = 59,
-            Locality = $"Name {i}", CoordinateUncertaintyInMeters = 10 + i
+            Type = SOS.Lib.Enums.LocationType.Point,
+            LocationId = $"site-{i}",
+            DecimalLongitude = 15,
+            DecimalLatitude = 59,
+            Locality = $"Name {i}",
+            CoordinateUncertaintyInMeters = 10 + i
         }).ToList();
-        return new CachedLocationAggregate
+        return new LocationAggregate
         {
-            Location = locations[0], Locations = locations, DistinctLocationId = locations[0].DistinctLocationId,
-            LocationIds = locations.Select(l => l.LocationId).ToList(),
+            Location = locations[0],
+            Locations = locations,
+            DistinctLocationId = locations[0].DistinctLocationId,
             ObservationSummary = new LocationObservationSummary { ObservationCount = count }
         };
     }

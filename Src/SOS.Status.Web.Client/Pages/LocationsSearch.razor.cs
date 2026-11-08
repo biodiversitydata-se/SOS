@@ -1,4 +1,4 @@
-﻿﻿﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using SOS.Api.Contracts.Common.Geo;
@@ -7,6 +7,7 @@ using SOS.Api.Contracts.Observations.Requests;
 using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Models;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -73,7 +74,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private CreatePolygonsMode createPolygonsMode = CreatePolygonsMode.WhenNeeded;
     private int mapFeatureCount;
     private string currentBboxText = "-";
-    private string currentMetersPerPixelText = "-";    
+    private string currentMetersPerPixelText = "-";
     private double currentZoomLevel = 10;
     private string lastSearchDurationText = "-";
     private string lastResponseSizeText = "-";
@@ -443,59 +444,24 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private async Task<MapSearchSnapshot?> GetObservationsAsync(CancellationToken cancellationToken, int version)
     {
-        if (string.IsNullOrWhiteSpace(searchFilter) || !mapInitialized)
+        if (string.IsNullOrWhiteSpace(searchFilter) || !mapInitialized || !await EnsureVisibleExtentAsync())
         {
             return null;
         }
 
-        if (currentVisibleExtent is null)
-        {
-            var currentExtent = await GetCurrentMapExtentAsync();
-            if (currentExtent is null)
-            {
-                return null;
-            }
-
-            UpdateMapDiagnostics(currentExtent);
-        }
-
         cancellationToken.ThrowIfCancellationRequested();
         var settings = GetCurrentSearchSettings();
-        var filterJson = settings.FilterJson;
-        var visibleExtent = currentVisibleExtent!.Value;
-        var requestedExtent = ExpandExtent(visibleExtent, settings.BboxBufferPercent / 100d);
-        SearchFilterInternalDto? searchFilterInternal;
-        SearchFilterInternalDto? observationSearchFilterInternal;
-        MapExtentBounds? observationPreviewExtent = null;
-        var bboxQuery = settings.IncludeBoundingBox ? FormatBoundingBoxQueryValue(requestedExtent) : null;
-        try
+        var requestedExtent = ExpandExtent(currentVisibleExtent!.Value, settings.BboxBufferPercent / 100d);
+        MapExtentBounds? observationPreviewExtent = settings.IncludeBoundingBox ? requestedExtent : null;
+        if (!TryCreateSearchFilters(settings.FilterJson, observationPreviewExtent, out var mapSearchFilterDto, out var previewFilterDto))
         {
-            searchFilterInternal = JsonSerializer.Deserialize<SearchFilterInternalDto>(filterJson, jsonSerializerOptions);
-            observationSearchFilterInternal = JsonSerializer.Deserialize<SearchFilterInternalDto>(filterJson, jsonSerializerOptions);
-            if (searchFilterInternal == null || observationSearchFilterInternal == null)
-            {
-                Snackbar.Add("Invalid search filter.");
-                return null;
-            }
-
-            if (searchFilterInternal.Geographics is not null)
-            {
-                searchFilterInternal.Geographics.BoundingBox = null;
-            }
-
-            observationPreviewExtent = settings.IncludeBoundingBox ? requestedExtent : null;
-            ConfigureObservationPreviewFilter(observationSearchFilterInternal, observationPreviewExtent);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Invalid search filter. {ex.Message}");
             return null;
         }
 
         try
         {
             var searchZoomLevel = currentZoomLevel;
-            var fetchedExtent = settings.IncludeBoundingBox ? requestedExtent : GetWorldExtent();
+            var fetchedExtent = observationPreviewExtent ?? GetWorldExtent();
             await InvokeAsync(StateHasChanged);
 
             var stopwatch = Stopwatch.StartNew();
@@ -508,14 +474,18 @@ public partial class LocationsSearch : IAsyncDisposable
                 return null;
             }
 
-            var options = settings.Options with { Bbox = bboxQuery, MetersPerPixel = metersPerPixel };
-            var searchResult = await searchService.AdaptiveSearchLocationItemsCachedGeoJson(searchFilterInternal, options, cancellationToken);
+            var options = settings.Options with
+            {
+                Bbox = settings.IncludeBoundingBox ? FormatBoundingBoxQueryValue(requestedExtent) : null,
+                MetersPerPixel = metersPerPixel
+            };
+            var searchResult = await searchService.AdaptiveSearchLocationItemsCachedGeoJson(mapSearchFilterDto, options, cancellationToken);
 
             if (disposed) return null;
 
             cancellationToken.ThrowIfCancellationRequested();
-            return new MapSearchSnapshot(searchResult, observationSearchFilterInternal,
-                JsonSerializer.Serialize(searchFilterInternal, jsonSerializerOptions), observationPreviewExtent,
+            return new MapSearchSnapshot(searchResult, previewFilterDto,
+                JsonSerializer.Serialize(mapSearchFilterDto, jsonSerializerOptions), observationPreviewExtent,
                 fetchedExtent, searchZoomLevel, settings, stopwatch.Elapsed);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
@@ -526,6 +496,57 @@ public partial class LocationsSearch : IAsyncDisposable
         }
     }
 
+    private async Task<bool> EnsureVisibleExtentAsync()
+    {
+        if (currentVisibleExtent is not null)
+        {
+            return true;
+        }
+
+        var extent = await GetCurrentMapExtentAsync();
+        if (extent is null)
+        {
+            return false;
+        }
+
+        UpdateMapDiagnostics(extent);
+        return currentVisibleExtent is not null;
+    }
+
+    /// <summary>
+    /// Parses the filter into two independent instances: one for the map search, where the
+    /// bounding box is removed since the viewport is sent as bbox, and one for the observation preview.
+    /// </summary>
+    private bool TryCreateSearchFilters(string filterJson, MapExtentBounds? observationPreviewExtent,
+        [NotNullWhen(true)] out SearchFilterInternalDto? mapSearchFilterDto,
+        [NotNullWhen(true)] out SearchFilterInternalDto? previewFilterDto)
+    {
+        mapSearchFilterDto = null;
+        previewFilterDto = null;
+        try
+        {
+            mapSearchFilterDto = JsonSerializer.Deserialize<SearchFilterInternalDto>(filterJson, jsonSerializerOptions);
+            previewFilterDto = JsonSerializer.Deserialize<SearchFilterInternalDto>(filterJson, jsonSerializerOptions);
+            if (mapSearchFilterDto == null || previewFilterDto == null)
+            {
+                Snackbar.Add("Invalid search filter.");
+                return false;
+            }
+
+            if (mapSearchFilterDto.Geographics is not null)
+            {
+                mapSearchFilterDto.Geographics.BoundingBox = null;
+            }
+
+            ConfigureObservationPreviewFilter(previewFilterDto, observationPreviewExtent);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Invalid search filter. {ex.Message}");
+            return false;
+        }
+    }
     private sealed record MapSearchSnapshot(LocationMapSearchResult Result,
         SearchFilterInternalDto PreviewFilter, string FilterJson, MapExtentBounds? PreviewExtent,
         MapExtentBounds FetchedExtent, double Zoom, MapSearchSettings Settings, TimeSpan Duration);
@@ -745,6 +766,40 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private bool ShowPointSizeLegend => pointSizeMode != PointSizeMode.Fixed &&
         string.Equals(lastResultType, "locations", StringComparison.OrdinalIgnoreCase) && pointSizeLegend.Count > 0;
+
+    private sealed record MapLegendItem(string Label, string Fill, string Border);
+
+    private sealed record MapLegendSection(string Title, string SymbolClass, IReadOnlyList<MapLegendItem> Items);
+
+    // Colors must match the map styles in LocationsSearch.razor.js.
+    private static readonly MapLegendSection[] MapLegendSections =
+    [
+        new("Punktlokaler och polygonlokaler", "map-legend-symbol--point",
+        [
+            new("Present", "yellow", "rgba(0,0,0,0.55)"),
+            new("PresentSensitive", "#d7191c", "rgba(0,0,0,0.45)"),
+            new("Treated", "#f97316", "rgba(0,0,0,0.45)"),
+            new("NotRecovered", "#8a8a8a", "rgba(0,0,0,0.45)"),
+            new("NotPresent", "black", "rgba(0,0,0,0.45)"),
+            new("DividedByYearUntil", "#ff69b4", "rgba(0,0,0,0.45)"),
+            new("Cluster", "dodgerblue", "rgba(0,0,0,0.45)")
+        ]),
+        new("Diffuserade lokaler", "map-legend-symbol--diffused",
+        [
+            new("Present", "rgba(255,0,0,0.20)", "rgba(180,0,0,0.85)"),
+            new("PresentSensitive", "rgba(120,0,0,0.34)", "rgba(95,0,0,0.90)"),
+            new("Treated", "rgba(249,115,22,0.32)", "rgba(194,65,12,0.90)"),
+            new("NotRecovered", "rgba(128,128,128,0.30)", "rgba(92,92,92,0.90)"),
+            new("NotPresent", "rgba(0,0,0,0.30)", "rgba(0,0,0,0.90)"),
+            new("DividedByYearUntil", "rgba(255,105,180,0.30)", "rgba(214,51,132,0.90)")
+        ]),
+        new("Gridrutor", "map-legend-symbol--grid",
+        [
+            new("Få observationer", "rgba(255,213,128,0.60)", "rgba(120,45,0,0.85)"),
+            new("Medel", "rgba(255,145,0,0.66)", "rgba(120,45,0,0.85)"),
+            new("Många observationer", "rgba(220,38,38,0.72)", "rgba(120,45,0,0.85)")
+        ])
+    ];
 
     private async Task OnShowCoordinateUncertaintyCirclesChanged(bool value)
     {

@@ -1,4 +1,4 @@
-﻿﻿using SOS.Api.Contracts.Observations.Responses;
+﻿using SOS.Api.Contracts.Observations.Responses;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Exports.Requests;
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Controllers;
 public class ObservationsController : ControllerBase
 {
     internal const string AdaptiveSearchLocationsCacheName = "adaptive-search-locations";
-    internal const int AdaptiveSearchLocationsCacheSizeLimit = 100_000;    
+    internal const int AdaptiveSearchLocationsCacheSizeLimit = 100_000;
 
     private static readonly FrozenSet<string> TaxonSumAggregationSortFields = new[]
     {
@@ -66,11 +66,11 @@ public class ObservationsController : ControllerBase
     private readonly ITaxonSearchManager _taxonSearchManager;
     private readonly ISearchFilterUtility _searchFilterUtility;
     private readonly IInputValidator _inputValidator;
-    private readonly ObservationApiConfiguration _observationApiConfiguration;    
+    private readonly ObservationApiConfiguration _observationApiConfiguration;
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
     private readonly SemaphoreLimitManager _semaphoreLimitManager;
-    private readonly ILocationManager _locationManager;    
+    private readonly ILocationManager _locationManager;
     private readonly IGeoJsonFileWriter _geoJsonFileWriter;
     private readonly IAdaptiveSearchService _adaptiveSearchService;
     private readonly IAdaptiveSearchLocationsService _adaptiveSearchLocationsService;
@@ -98,18 +98,18 @@ public class ObservationsController : ControllerBase
         ITaxonSearchManager taxonSearchManager,
         ISearchFilterUtility searchFilterUtility,
         IInputValidator inputValidator,
-        ObservationApiConfiguration observationApiConfiguration,        
+        ObservationApiConfiguration observationApiConfiguration,
         IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
         IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
         SemaphoreLimitManager semaphoreLimitManager,
-        ILocationManager locationManager,        
+        ILocationManager locationManager,
         IGeoJsonFileWriter geoJsonFileWriter,
         IAdaptiveSearchService adaptiveSearchService,
         IAdaptiveSearchLocationsService adaptiveSearchLocationsService,
         ILogger<ObservationsController> logger)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-         _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
+        _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
         _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
         _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
         _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
@@ -158,7 +158,7 @@ public class ObservationsController : ControllerBase
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-            
+
             occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
 
             var observation = await _observationManager.GetObservationAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
@@ -219,19 +219,19 @@ public class ObservationsController : ControllerBase
             // SearchFilterDto don't support protection filter, declare it localy
             var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
-            
+
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
-            
+
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics));
-            
+
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
             var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, "sv-SE");
             var matchCount = await _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-            
+
             this.LogObservationCount(matchCount);
             return new OkObjectResult(matchCount);
         }
@@ -560,7 +560,7 @@ public class ObservationsController : ControllerBase
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto? filter,
         [FromQuery] int skip = 0,
-        [FromQuery] int take = 100,        
+        [FromQuery] int take = 100,
         [FromQuery] string sortBy = "",
         [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
         [FromQuery] bool validateSearchFilter = false,
@@ -584,7 +584,7 @@ public class ObservationsController : ControllerBase
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
             var validationResult = Result.Combine(
-                _inputValidator.ValidateSearchPagingArguments(skip, take),                    
+                _inputValidator.ValidateSearchPagingArguments(skip, take),
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics),
@@ -607,7 +607,7 @@ public class ObservationsController : ControllerBase
                 }
             }
             SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
-            
+
 
             PagedResult<JsonObject> result = await _observationManager.GetChunkAsync(roleId,
                 authorizationApplicationIdentifier, searchFilter, skip, take,
@@ -635,8 +635,8 @@ public class ObservationsController : ControllerBase
                 bbox: null,
                 geographicAreas: null,
                 groupByLocation: false);
-                        
-            return new EmptyResult();          
+
+            return new EmptyResult();
         }
         catch (AuthenticationRequiredException e)
         {
@@ -710,7 +710,7 @@ public class ObservationsController : ControllerBase
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
-    {        
+    {
         const string defaultSortBy = "modified";
         ApiUserType userType = this.GetApiUserType();
         var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
@@ -850,11 +850,11 @@ public class ObservationsController : ControllerBase
             if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
             {
                 sortBy = sortFieldValidationResult.Value.First();
-            }                
+            }
 
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-            
+
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
             var searchFilter = new SearchFilterInternal(this.GetUserId(), sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
             {
@@ -1042,7 +1042,7 @@ public class ObservationsController : ControllerBase
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterAggregationDto? filter,
         [FromQuery] int? skip = null,
-        [FromQuery] int? take = null,            
+        [FromQuery] int? take = null,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -1163,7 +1163,7 @@ public class ObservationsController : ControllerBase
 
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
-            
+
             occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
             JsonObject? observation = null;
             var attempts = protectionFilter == ProtectionFilterDto.BothPublicAndSensitive ? 2 : 1;
@@ -1183,7 +1183,7 @@ public class ObservationsController : ControllerBase
                     {
                         continue;
                     }
-                        
+
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
             }
@@ -1430,7 +1430,7 @@ public class ObservationsController : ControllerBase
             }
 
             var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-          
+
             GeoGridResultDto dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
             return new OkObjectResult(dto);
         }
@@ -1518,8 +1518,8 @@ public class ObservationsController : ControllerBase
             {
                 return BadRequest(validationResult.Error);
             }
-           
-            var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);         
+
+            var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
             string strJson = result.GetFeatureCollectionGeoJson();
             var bytes = Encoding.UTF8.GetBytes(strJson);
             return File(bytes, "application/json", "grid.geojson");
@@ -1662,7 +1662,7 @@ public class ObservationsController : ControllerBase
         {
             semaphoreResult.Semaphore.Release();
         }
-    }               
+    }
 
     /// <summary>
     /// Aggregates observations into grid cells. Each grid cell contains the number
@@ -1723,7 +1723,7 @@ public class ObservationsController : ControllerBase
                 return BadRequest(validationResult.Error);
             }
 
-            
+
             var result = await _observationManager.GetMetricGridAggregationAsync(
                 roleId,
                 authorizationApplicationIdentifier,
@@ -1760,7 +1760,7 @@ public class ObservationsController : ControllerBase
             semaphoreResult.Semaphore.Release();
         }
     }
-    
+
     /// <summary>
     ///     Get observations matching the provided search filter. Permitted filter values depends on the specific filter field:
     ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
@@ -1884,7 +1884,7 @@ public class ObservationsController : ControllerBase
             SearchResultMetadataDto? metadata = null;
             if (includePolygonLocations && result.Records?.Any() == true)
             {
-                metadata = await GetPolygonLocationMetadataAsync(result.Records);   
+                metadata = await GetPolygonLocationMetadataAsync(result.Records);
             }
 
             GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat, metadata);
@@ -2012,11 +2012,11 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [InternalApi]    
+    [InternalApi]
     public async Task<IActionResult> AdaptiveSearchInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? filter,        
+        [FromBody] SearchFilterInternalDto? filter,
         [FromQuery] int observationsLimit = 10000,
         [FromQuery] int maxZoom = 21,
         [FromQuery] int maxGridCells = 10000,
@@ -2065,7 +2065,7 @@ public class ObservationsController : ControllerBase
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-            var validationResult = Result.Combine(                
+            var validationResult = Result.Combine(
                 _inputValidator.ValidateInt(observationsLimit, 0, 10000, nameof(observationsLimit)),
                 _inputValidator.ValidateInt(maxZoom, 1, 21, nameof(maxZoom)),
                 _inputValidator.ValidateInt(maxGridCells, 1, 10000, nameof(maxGridCells)),
@@ -2074,7 +2074,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-            
+
             var result = await _adaptiveSearchService.SearchAsync(new AdaptiveSearchRequest
             {
                 RoleId = roleId,
@@ -2210,8 +2210,8 @@ public class ObservationsController : ControllerBase
         [FromQuery] int observationsLimit = 10000,
         [FromQuery] int maxZoom = 21,
         [FromQuery] int maxGridCells = 10000,
-        [FromQuery] bool returnInputBBox = false,        
-        [FromQuery] bool sensitiveObservations = false,        
+        [FromQuery] bool returnInputBBox = false,
+        [FromQuery] bool sensitiveObservations = false,
         [FromQuery] bool cluster = true,
         [FromQuery] double? clusterRadiusMeters = null,
         [FromQuery] double? metersPerPixel = null,
@@ -2243,34 +2243,13 @@ public class ObservationsController : ControllerBase
                 return BadRequest(bboxQueryError);
             }
 
+            // Captured before InitializeSearchFilterAsync, which clips the bounding box.
             var inputBbox = filter.Geographics?.BoundingBox.GetCompleteBoundingBox();
-            var bbox = inputBbox;
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             filter.ProtectionFilter ??= sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);            
-            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter); // todo - behövs denna? Går det att förenkla bbox-init för bättre prestanda?
-            var validationResult = Result.Combine( // todo - Behövs alla valideringar?
-                _inputValidator.ValidateInt(observationsLimit, 0, 10000, nameof(observationsLimit)),
-                _inputValidator.ValidateInt(maxZoom, 1, 21, nameof(maxZoom)),
-                _inputValidator.ValidateInt(maxGridCells, 1, 10000, nameof(maxGridCells)),
-                _inputValidator.ValidateDouble(clusterRadiusPx, 1, 500, nameof(clusterRadiusPx)),
-                _inputValidator.ValidateInt(minLocationsPerCluster, 2, 100, nameof(minLocationsPerCluster)),
-                _inputValidator.ValidateInt(minLocationCountBeforeClustering, 0, 10000, nameof(minLocationCountBeforeClustering)),
-                _inputValidator.ValidateInt(locationAggregationLimit, 1, 10000, nameof(locationAggregationLimit)),
-                clusterRadiusMeters.HasValue && (!double.IsFinite(clusterRadiusMeters.Value) || clusterRadiusMeters.Value <= 0)
-                    ? Result.Failure("clusterRadiusMeters must be positive and finite.") : Result.Success(),
-                ValidateMetersPerPixel(metersPerPixel),
-                !double.IsFinite(switchToDetailClusteringAtMetersPerPixel) || switchToDetailClusteringAtMetersPerPixel < 0
-                    ? Result.Failure("switchToDetailClusteringAtMetersPerPixel must be non-negative and finite.") : Result.Success(),
-                !double.IsFinite(detailClusterRadiusPx) || detailClusterRadiusPx < 0 || detailClusterRadiusPx > 500
-                    ? Result.Failure("detailClusterRadiusPx must be finite and between 0 and 500.") : Result.Success(),
-                ValidateMetersPerPixelForPolygonMode((CreatePolygonsMode)createPolygons, metersPerPixel),
-                //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics));
-
-            if (validationResult.IsFailure) return BadRequest(validationResult.Error);            
-
-            var result = await _adaptiveSearchLocationsService.SearchAsync(new AdaptiveSearchLocationsRequest
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+            var request = new AdaptiveSearchLocationsRequest
             {
                 CancellationToken = HttpContext?.RequestAborted ?? default,
                 RoleId = roleId,
@@ -2278,7 +2257,6 @@ public class ObservationsController : ControllerBase
                 Filter = filter,
                 UserId = this.GetUserId(),
                 InputBbox = inputBbox,
-                Bbox = bbox,
                 ReturnInputBBox = returnInputBBox,
                 SensitiveObservations = sensitiveObservations,
                 ObservationsLimit = observationsLimit,
@@ -2292,23 +2270,27 @@ public class ObservationsController : ControllerBase
                 ClusterRadiusPx = clusterRadiusPx,
                 MinLocationsPerCluster = minLocationsPerCluster,
                 MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
-                CreatePolygons = (CreatePolygonsMode)createPolygons,
+                CreatePolygons = createPolygons,
                 UseCache = useCache,
                 CreateSampleObservations = createSampleObservations,
                 LocationAggregationLimit = locationAggregationLimit,
                 AdaptiveSearchStrategy = adaptiveSearchStrategy,
                 CutoffYear = cutoffYear,
                 IncludeFilterAreasInResult = includeFilterAreasInResult,
-                BoundingBoxIsEmpty = IsEmptyBoundingBox(filter?.Geographics?.BoundingBox)
-            });
+                BoundingBoxIsEmpty = IsEmptyBoundingBox(filter.Geographics?.BoundingBox)
+            };
 
-            if (result.CacheStatus == "HIT")
+            var validationResult = ValidateAdaptiveSearchLocationsRequest(request);
+            if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
+            var result = await _adaptiveSearchLocationsService.SearchAsync(request);
+            if (result.CacheStatus == AdaptiveSearchLocationsCacheStatus.Hit)
             {
                 HttpContext?.Items["CacheUsed"] = true;
             }
 
             HttpContext?.RequestAborted.ThrowIfCancellationRequested();
-            var filterAreaReferences = FilterAreaReferenceFactory.Create(filter?.Geographics, Request.PathBase);
+            var filterAreaReferences = FilterAreaReferenceFactory.Create(filter.Geographics, Request.PathBase);
             return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear, filterAreaReferences);
         }
         catch (AuthenticationRequiredException e)
@@ -2324,7 +2306,7 @@ public class ObservationsController : ControllerBase
             return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
         }
         catch (OperationCanceledException) when (HttpContext?.RequestAborted.IsCancellationRequested == true)
-        {            
+        {
             return new EmptyResult();
         }
         catch (Exception e)
@@ -2372,23 +2354,50 @@ public class ObservationsController : ControllerBase
         Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
         Response.ContentType = "application/geo+json; charset=utf-8";
 
-        if (result.ResultType == "geogrid")
+        if (result.ResultType == AdaptiveSearchLocationsResultType.Geogrid)
         {
-            await Response.WriteAsync(AdaptiveSearchLocationsGeoJsonWriter.AddFilterAreaReferences(
-                result.GeoJson, filterAreaReferences), Encoding.UTF8, HttpContext.RequestAborted);
-            await Response.Body.FlushAsync(HttpContext.RequestAborted);
-            return new EmptyResult();
+            await AdaptiveSearchLocationsGeoJsonWriter.WriteGeogridFeatureCollectionAsync(
+                result.GridResult!,
+                result.Bbox,
+                Response,
+                result.GeographicAreas,
+                HttpContext.RequestAborted,
+                filterAreaReferences);
+        }
+        else
+        {
+            await AdaptiveSearchLocationsGeoJsonWriter.WriteFeatureCollectionAsync(
+                result.LocationFeatures ?? Array.Empty<LocationFeature>(),
+                result.Bbox,
+                Response,
+                cutoffYear,
+                result.GeographicAreas,
+                HttpContext.RequestAborted,
+                filterAreaReferences);
         }
 
-        await AdaptiveSearchLocationsGeoJsonWriter.WriteFeatureCollectionAsync(
-            result.LocationFeatures ?? Array.Empty<LocationFeature>(),
-            result.Bbox,
-            Response,
-            cutoffYear,
-            result.GeographicAreas,
-            HttpContext.RequestAborted,
-            filterAreaReferences);
         return new EmptyResult();
+    }
+
+    private Result ValidateAdaptiveSearchLocationsRequest(AdaptiveSearchLocationsRequest request)
+    {
+        return Result.Combine(
+            _inputValidator.ValidateInt(request.ObservationsLimit, 0, 10000, "observationsLimit"),
+            _inputValidator.ValidateInt(request.MaxZoom, 1, 21, "maxZoom"),
+            _inputValidator.ValidateInt(request.MaxGridCells, 1, 10000, "maxGridCells"),
+            _inputValidator.ValidateDouble(request.ClusterRadiusPx, 1, 500, "clusterRadiusPx"),
+            _inputValidator.ValidateInt(request.MinLocationsPerCluster, 2, 100, "minLocationsPerCluster"),
+            _inputValidator.ValidateInt(request.MinimumLocationCountBeforeClustering, 0, 10000, "minLocationCountBeforeClustering"),
+            _inputValidator.ValidateInt(request.LocationAggregationLimit, 1, 10000, "locationAggregationLimit"),
+            request.ClusterRadiusMeters is { } clusterRadiusMeters && (!double.IsFinite(clusterRadiusMeters) || clusterRadiusMeters <= 0)
+                ? Result.Failure("clusterRadiusMeters must be positive and finite.") : Result.Success(),
+            ValidateMetersPerPixel(request.MetersPerPixel),
+            !double.IsFinite(request.SwitchToDetailClusteringAtMetersPerPixel) || request.SwitchToDetailClusteringAtMetersPerPixel < 0
+                ? Result.Failure("switchToDetailClusteringAtMetersPerPixel must be non-negative and finite.") : Result.Success(),
+            !double.IsFinite(request.DetailClusterRadiusPx) || request.DetailClusterRadiusPx < 0 || request.DetailClusterRadiusPx > 500
+                ? Result.Failure("detailClusterRadiusPx must be finite and between 0 and 500.") : Result.Success(),
+            ValidateMetersPerPixelForPolygonMode(request.CreatePolygons, request.MetersPerPixel),
+            _inputValidator.ValidateGeometries(request.Filter.Geographics));
     }
 
     private static bool IsEmptyBoundingBox(LatLonBoundingBoxDto? boundingBox)
@@ -2663,11 +2672,11 @@ public class ObservationsController : ControllerBase
             {
                 return BadRequest(validationResult.Error);
             }
-                            
+
             var result = await _observationManager.GetTimeSeriesHistogramAsync(
-                roleId, 
-                authorizationApplicationIdentifier, 
-                filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"), 
+                roleId,
+                authorizationApplicationIdentifier,
+                filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"),
                 timeSeriesType);
             ArgumentNullException.ThrowIfNull(result);
             return new OkObjectResult(result);
@@ -2745,7 +2754,7 @@ public class ObservationsController : ControllerBase
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
             const int maxTotalCount = 100000;
-            var validationResult = Result.Combine(                    
+            var validationResult = Result.Combine(
                 string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics),
@@ -2916,7 +2925,7 @@ public class ObservationsController : ControllerBase
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int? skip = null,
-        [FromQuery] int? take = null,            
+        [FromQuery] int? take = null,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false,
@@ -3060,7 +3069,7 @@ public class ObservationsController : ControllerBase
     public async Task<IActionResult> ObservedTaxaInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto? filter,            
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -3103,7 +3112,7 @@ public class ObservationsController : ControllerBase
             if (result.IsFailure)
             {
                 return BadRequest(result.Error);
-            }               
+            }
 
             return new OkObjectResult(result.Value);
         }
@@ -3155,7 +3164,7 @@ public class ObservationsController : ControllerBase
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] AreaTypeAggregate? areaType = null,
-        [FromQuery] bool validateSearchFilter = false,            
+        [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false,
         [FromQuery] bool sumTaxaTree = false,
         [FromQuery] bool pruneTaxaTree = false,
@@ -3202,10 +3211,10 @@ public class ObservationsController : ControllerBase
                 areaType);
 
             if (sumTaxaTree)
-            {                    
+            {
                 await _taxonSearchManager.CreateTaxonAreaSumWithLowMemoryAsync(
-                    result, 
-                    aggregateArea: areaType.HasValue, 
+                    result,
+                    aggregateArea: areaType.HasValue,
                     pruneTaxaTree);
             }
 
@@ -3564,5 +3573,5 @@ public class ObservationsController : ControllerBase
             _logger.LogError(e, "Failed to get user year month count");
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
-    }        
+    }
 }

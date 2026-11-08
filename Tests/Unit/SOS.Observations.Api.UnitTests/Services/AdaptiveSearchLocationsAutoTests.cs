@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
@@ -40,9 +40,15 @@ public class AdaptiveSearchLocationsAutoTests
         var filter = new SearchFilterInternalDto { ProtectionFilter = sensitive ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public };
         AdaptiveSearchLocationsRequest Request(AdaptiveSearchLocationsStrategy strategy) => new()
         {
-            Filter = filter, AdaptiveSearchStrategy = strategy, ObservationsLimit = 100,
-            Cluster = clusterMode is 2 or 3, ClusterRadiusMeters = clusterMode is 1 or 3 ? 100 : null,
-            MetersPerPixel = 1, SwitchToDetailClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40, MinLocationsPerCluster = 2,
+            Filter = filter,
+            AdaptiveSearchStrategy = strategy,
+            ObservationsLimit = 100,
+            Cluster = clusterMode is 2 or 3,
+            ClusterRadiusMeters = clusterMode is 1 or 3 ? 100 : null,
+            MetersPerPixel = 1,
+            SwitchToDetailClusteringAtMetersPerPixel = 0,
+            ClusterRadiusPx = 40,
+            MinLocationsPerCluster = 2,
             MinimumLocationCountBeforeClustering = 0
         };
 
@@ -82,7 +88,9 @@ public class AdaptiveSearchLocationsAutoTests
         var result = await Service(manager).SearchAsync(new AdaptiveSearchLocationsRequest
         {
             Filter = new SearchFilterInternalDto { ProtectionFilter = mixed ? ProtectionFilterDto.BothPublicAndSensitive : ProtectionFilterDto.Public },
-            ObservationsLimit = 100, CutoffYear = cutoff, CreateSampleObservations = samples
+            ObservationsLimit = 100,
+            CutoffYear = cutoff,
+            CreateSampleObservations = samples
         });
         result.LocationAggregationMode.Should().BeNull();
         result.AdaptiveSearchStrategy.Should().Be(AdaptiveSearchLocationsStrategy.ObservationsThenGrid);
@@ -111,7 +119,10 @@ public class AdaptiveSearchLocationsAutoTests
         var manager = Manager(records, estimate);
         var result = await Service(manager).SearchAsync(new AdaptiveSearchLocationsRequest
         {
-            Filter = new SearchFilterInternalDto(), LocationAggregationLimit = 2, MaxGridCells = 100, MaxZoom = 20
+            Filter = new SearchFilterInternalDto(),
+            LocationAggregationLimit = 2,
+            MaxGridCells = 100,
+            MaxZoom = 20
         });
         result.ResultType.Should().Be(grid ? "geogrid" : "locations");
         result.AdaptiveSearchStrategy.Should().Be(AdaptiveSearchLocationsStrategy.LocationsThenGrid);
@@ -128,7 +139,9 @@ public class AdaptiveSearchLocationsAutoTests
         var manager = Manager(Enumerable.Range(0, count).Select(i => Record("a", 15, false, 1, 2023 + i * 2)).ToArray());
         var result = await Service(manager).SearchAsync(new AdaptiveSearchLocationsRequest
         {
-            Filter = new SearchFilterInternalDto(), AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid, CutoffYear = 2024
+            Filter = new SearchFilterInternalDto(),
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
+            CutoffYear = 2024
         });
         result.LocationPresentationStatusApproximated.Should().Be(approximated);
         result.AdaptiveSearchStrategy.Should().Be(AdaptiveSearchLocationsStrategy.LocationsThenGrid);
@@ -155,9 +168,15 @@ public class AdaptiveSearchLocationsAutoTests
         var manager = Manager([Record("a", 15, false, 1, 2023), Record("b", 15.0001, false, 1, 2023), Record("b", 15.0001, false, 2, 2025)]);
         var result = await Service(manager).SearchAsync(new AdaptiveSearchLocationsRequest
         {
-            Filter = new(), AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
-            CutoffYear = 2024, Cluster = cluster, MetersPerPixel = 1, SwitchToDetailClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40,
-            MinLocationsPerCluster = 2, MinimumLocationCountBeforeClustering = 0
+            Filter = new(),
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
+            CutoffYear = 2024,
+            Cluster = cluster,
+            MetersPerPixel = 1,
+            SwitchToDetailClusteringAtMetersPerPixel = 0,
+            ClusterRadiusPx = 40,
+            MinLocationsPerCluster = 2,
+            MinimumLocationCountBeforeClustering = 0
         });
         result.LocationPresentationStatusApproximated.Should().BeTrue();
         if (cluster)
@@ -206,8 +225,8 @@ public class AdaptiveSearchLocationsAutoTests
     private sealed class UnusedCache : IAdaptiveSearchLocationsCache
     {
         public string CreateCacheKey(int? roleId, string? application, bool sensitive, SearchFilterInternalDto filter) => throw new InvalidOperationException("Cache must be bypassed.");
-        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false) => throw new InvalidOperationException("Cache must be bypassed.");
-        public void Set(string key, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations) => throw new InvalidOperationException("Cache must be bypassed.");
-        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => null;
+        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false) => throw new InvalidOperationException("Cache must be bypassed.");
+        public void Set(string key, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations) => throw new InvalidOperationException("Cache must be bypassed.");
+        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations) => null;
     }
 }

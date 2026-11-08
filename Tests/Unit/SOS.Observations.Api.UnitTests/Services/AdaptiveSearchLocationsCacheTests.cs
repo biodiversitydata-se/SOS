@@ -50,7 +50,9 @@ public class AdaptiveSearchLocationsCacheTests
         {
             Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
             AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
-            LocationAggregationLimit = 2, MaxGridCells = 100, MaxZoom = 20
+            LocationAggregationLimit = 2,
+            MaxGridCells = 100,
+            MaxZoom = 20
         });
 
         result.ResultType.Should().Be("geogrid");
@@ -102,7 +104,7 @@ public class AdaptiveSearchLocationsCacheTests
         input.ServerGeometries.Should().ContainSingle().Which.Should().BeSameAs(geometry);
         input.BoundingBox.Should().NotBeNull();
         input.Geometries.Should().BeNull();
-        key.Should().StartWith("adaptive-search-locations:v6:");
+        key.Should().StartWith("adaptive-search-locations:v7:");
     }
 
     [Theory]
@@ -125,7 +127,6 @@ public class AdaptiveSearchLocationsCacheTests
             Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
             ReturnInputBBox = returnInputBBox,
             InputBbox = inputBbox,
-            Bbox = inputBbox,
             UseCache = false
         });
 
@@ -165,7 +166,9 @@ public class AdaptiveSearchLocationsCacheTests
             UserId = 123,
             Filter = new SearchFilterInternalDto
             {
-                ProtectionFilter = protection, ObservedByMe = observedByMe, ReportedByMe = reportedByMe
+                ProtectionFilter = protection,
+                ObservedByMe = observedByMe,
+                ReportedByMe = reportedByMe
             },
             AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
             UseCache = true,
@@ -225,7 +228,7 @@ public class AdaptiveSearchLocationsCacheTests
     {
         using var fixture = new CacheFixture();
         var bbox = Box(0);
-        var locations = new List<CachedLocationAggregate>();
+        var locations = new List<LocationAggregate>();
         fixture.Cache.Set("key", bbox, locations);
         var previous = fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value;
         fixture.Cache.Set("key", Box(1), new());
@@ -277,11 +280,13 @@ public class AdaptiveSearchLocationsCacheTests
                 ProtectionFilter = ProtectionFilterDto.Public,
                 Geographics = new GeographicsFilterDto
                 {
-                    ConsiderObservationAccuracy = accuracy, ConsiderDisturbanceRadius = disturbance
+                    ConsiderObservationAccuracy = accuracy,
+                    ConsiderDisturbanceRadius = disturbance
                 }
             },
             AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-            UseCache = true, ObservationsLimit = 100
+            UseCache = true,
+            ObservationsLimit = 100
         });
         cache.RequiredExactBoundingBox.Should().Be(accuracy || disturbance);
         manager.VerifyNoOtherCalls();
@@ -337,7 +342,7 @@ public class AdaptiveSearchLocationsCacheTests
     {
         using var fixture = new CacheFixture();
         var summary = Aggregate("left", 0.499999, 7);
-        summary.LocationIds.Add("right");
+        summary.Locations.Add(new Location { LocationId = "right", DecimalLongitude = 0.5, DecimalLatitude = 0.5 });
         fixture.Cache.Set("key", Box(0), new() { summary });
 
         fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 0.5, 0), out _).Should().BeFalse();
@@ -352,17 +357,25 @@ public class AdaptiveSearchLocationsCacheTests
     {
         using var fixture = new CacheFixture();
         var aggregate = Aggregate("a", 0.5, 20);
-        var other = new Location { LocationId = "b", DecimalLongitude = 0.5, DecimalLatitude = 0.5,
-            Locality = "Second name", CoordinateUncertaintyInMeters = 200 };
-        aggregate = new CachedLocationAggregate
+        var other = new Location
         {
-            DistinctLocationId = aggregate.DistinctLocationId, Location = aggregate.Location,
-            Locations = new() { aggregate.Location, other }, LocationIds = new() { "a", "b" },
-            ObservationSummary = aggregate.ObservationSummary, IsSummaryApproximated = approximated,
+            LocationId = "b",
+            DecimalLongitude = 0.5,
+            DecimalLatitude = 0.5,
+            Locality = "Second name",
+            CoordinateUncertaintyInMeters = 200
+        };
+        aggregate = new LocationAggregate
+        {
+            DistinctLocationId = aggregate.DistinctLocationId,
+            Location = aggregate.Location,
+            Locations = new() { aggregate.Location, other },
+            ObservationSummary = aggregate.ObservationSummary,
+            IsSummaryApproximated = approximated,
             IsPresentationStatusApproximated = approximated
         };
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
-        var input = new List<CachedLocationAggregate> { aggregate };
+        var input = new List<LocationAggregate> { aggregate };
         var before = LocationFeatureResponseMapper.ToProperties(factory.CreateItems(input, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single());
         fixture.Cache.Set("metadata", Box(0), input);
         fixture.Cache.TryGet("metadata", Box(0), out var restored).Should().BeTrue();
@@ -373,16 +386,20 @@ public class AdaptiveSearchLocationsCacheTests
         after.IsPresentationStatusApproximated.Should().Be(approximated);
     }
 
-    private static CachedLocationAggregate Aggregate(string id, double longitude, int count)
+    private static LocationAggregate Aggregate(string id, double longitude, int count)
     {
         var location = new Location
         {
-            LocationId = id, DecimalLongitude = longitude, DecimalLatitude = 0.5
+            LocationId = id,
+            DecimalLongitude = longitude,
+            DecimalLatitude = 0.5
         };
-        return new CachedLocationAggregate
+        return new LocationAggregate
         {
-            DistinctLocationId = location.DistinctLocationId, Location = location,
-            LocationIds = new() { id }, ObservationSummary = new LocationObservationSummary { ObservationCount = count }
+            DistinctLocationId = location.DistinctLocationId,
+            Location = location,
+            Locations = new() { location },
+            ObservationSummary = new LocationObservationSummary { ObservationCount = count }
         };
     }
 
@@ -399,10 +416,10 @@ public class AdaptiveSearchLocationsCacheTests
         public bool RequiredExactBoundingBox { get; private set; }
         public string CreateCacheKey(int? roleId, string? application, bool sensitive, SearchFilterInternalDto filter)
         { Calls++; return "shared"; }
-        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false)
         { Calls++; RequiredExactBoundingBox = requireExactBoundingBox; locations = new(); return true; }
-        public void Set(string key, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations) => Calls++;
-        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => null;
+        public void Set(string key, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations) => Calls++;
+        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations) => null;
     }
 
     private sealed class TestClock : TimeProvider

@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
 internal interface IAdaptiveSearchLocationFeatureFactory
 {
-    List<LocationFeature> CreateItems(List<CachedLocationAggregate> locations, LocationFeatureOptions options);
+    List<LocationFeature> CreateItems(List<LocationAggregate> locations, LocationFeatureOptions options);
     List<LocationFeature> CreateItems(IEnumerable<JsonObject> records, LocationFeatureOptions options);
 }
 
@@ -28,13 +28,13 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         _aggregator = aggregator ?? throw new ArgumentNullException(nameof(aggregator));
     }
 
-    public List<LocationFeature> CreateItems(List<CachedLocationAggregate> locations, LocationFeatureOptions options) =>
+    public List<LocationFeature> CreateItems(List<LocationAggregate> locations, LocationFeatureOptions options) =>
         options.ShouldCluster ? CreateClusterItems(locations, options) : CreateUnclusteredItems(locations, options);
 
     public List<LocationFeature> CreateItems(IEnumerable<JsonObject> records, LocationFeatureOptions options) =>
         options.ShouldCluster ? CreateClusterItems(records, options) : CreateUnclusteredItems(records, options);
 
-    private List<LocationFeature> CreateClusterItems(List<CachedLocationAggregate> locationAggregates, LocationFeatureOptions options)
+    private List<LocationFeature> CreateClusterItems(List<LocationAggregate> locationAggregates, LocationFeatureOptions options)
     {
         if (locationAggregates.Count == 0)
         {
@@ -43,7 +43,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
 
         var preparedPolygonGeometries = PreparePolygonGeometries(
             locationAggregates, options.PolygonGeometries, options.CreatePolygons, options.MetersPerPixel);
-        var polygonLocations = preparedPolygonGeometries.Count == 0 ? new List<CachedLocationAggregate>() : locationAggregates
+        var polygonLocations = preparedPolygonGeometries.Count == 0 ? new List<LocationAggregate>() : locationAggregates
             .Where(location => KeepOutsideClustering(preparedPolygonGeometries, location.DistinctLocationId))
             .ToList();
         var clusterableLocations = polygonLocations.Count == 0 ? locationAggregates : locationAggregates
@@ -53,20 +53,20 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
             location => location.DistinctLocationId,
             StringComparer.Ordinal);
 
-        var locationFeatures = CreateLocationFeaturesFromCachedAggregates(
+        var locationFeatures = CreateClusteredLocationFeatures(
             clusterableLocations, aggregatesByDistinctLocationId, options);
         locationFeatures.AddRange(polygonLocations.Select(location =>
-            CreateLocationFeatureFromCachedAggregates(new[] { location }, false)));
+            CreateLocationFeature(new[] { location }, false)));
 
         ApplyFallbackClusterRadiusMeters(locationFeatures, options.MetersPerPixel, options.ClusterRadiusPx);
         ApplyGeometries(locationFeatures, options.PolygonGeometries, options.CreatePolygons, options.MetersPerPixel, preparedPolygonGeometries);
         return locationFeatures;
     }
 
-    private List<LocationFeature> CreateUnclusteredItems(List<CachedLocationAggregate> locationAggregates, LocationFeatureOptions options)
+    private List<LocationFeature> CreateUnclusteredItems(List<LocationAggregate> locationAggregates, LocationFeatureOptions options)
     {
         var locationFeatures = locationAggregates
-            .Select(location => CreateLocationFeatureFromCachedAggregates(new[] { location }, false))
+            .Select(location => CreateLocationFeature(new[] { location }, false))
             .ToList();
 
         ApplyGeometries(locationFeatures, options.PolygonGeometries, options.CreatePolygons, options.MetersPerPixel);
@@ -119,29 +119,28 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         return locationFeatures;
     }
 
-    private List<LocationFeature> CreateLocationFeaturesFromCachedAggregates(
-        List<CachedLocationAggregate> locationAggregates,
-        Dictionary<string, CachedLocationAggregate> aggregatesByDistinctLocationId,
+    private List<LocationFeature> CreateClusteredLocationFeatures(
+        List<LocationAggregate> locationAggregates,
+        Dictionary<string, LocationAggregate> aggregatesByDistinctLocationId,
         LocationFeatureOptions options)
     {
         var clusterer = new Sweref99TmFastGreedyLocationClusterer(options.MinLocationCountBeforeClustering,
             DefaultMaxLocationCountAfterClustering, options.MinLocationsPerCluster);
         var groups = clusterer.ClusterGroups(locationAggregates.Select(aggregate => aggregate.Location), options.Clustering);
-        return groups.Select(group => CreateLocationFeatureFromCachedAggregates(
+        return groups.Select(group => CreateLocationFeature(
             group.DistinctLocationIds.Select(id => aggregatesByDistinctLocationId[id]),
             group.IsCluster, group.RadiusMeters, group.GroupingType, group.MetricCenter)).ToList();
     }
 
-    private static LocationFeature CreateLocationFeatureFromCachedAggregates(
-        IEnumerable<CachedLocationAggregate> aggregates,
+    private static LocationFeature CreateLocationFeature(
+        IEnumerable<LocationAggregate> aggregates,
         bool isCluster,
         double? clusterRadiusMeters = null, SOS.Api.Contracts.Observations.Responses.LocationGroupingType groupingType = SOS.Api.Contracts.Observations.Responses.LocationGroupingType.PixelCluster, Point? metricCenter = null)
     {
         var aggregateList = aggregates.ToList();
         var locations = aggregateList.Select(aggregate => aggregate.Location).ToList();
-        var observationSummary = aggregateList.Count == 1
-            ? CopySingleSummary(aggregateList[0].ObservationSummary)
-            : CombineLocationObservationSummaries(aggregateList);
+        // Always create a new summary, also for a single aggregate, since aggregates may be shared through the cache.
+        var observationSummary = CombineLocationObservationSummaries(aggregateList);
         var locationIds = aggregateList
             .SelectMany(aggregate => aggregate.LocationIds)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -155,7 +154,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         {
             IsCluster = isCluster,
             GroupingType = groupingType,
-            OriginalLocations = aggregateList.SelectMany(a => a.Locations.Count > 0 ? a.Locations : new[] { a.Location }.ToList()).ToList(),
+            OriginalLocations = aggregateList.SelectMany(aggregate => aggregate.Locations).ToList(),
             GeneralizedLocationIds = aggregateList.SelectMany(a => a.GeneralizedLocationIds).ToHashSet(StringComparer.OrdinalIgnoreCase),
             LocationCount = locations.Count,
             ObservationCount = observationSummary.ObservationCount,
@@ -184,64 +183,48 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         return locationFeature;
     }
 
-    // Copy mutable summary state so response processing cannot modify cached aggregates.
-    private static LocationObservationSummary CopySingleSummary(LocationObservationSummary source) => new()
+    private static LocationObservationSummary CombineLocationObservationSummaries(IReadOnlyCollection<LocationAggregate> aggregates)
     {
-        ObservationCount = source.ObservationCount,
-        FoundCount = source.FoundCount,
-        TreatedCount = source.TreatedCount,
-        DiffusedCount = source.DiffusedCount,
-        RedlistedCount = source.RedlistedCount,
-        InvasiveInSwedenCount = source.InvasiveInSwedenCount,
-        NotRecoveredCount = source.NotRecoveredCount,
-        NeverFoundCount = source.NeverFoundCount,
-        MinPresentEndYear = source.MinPresentEndYear,
-        MaxPresentEndYear = source.MaxPresentEndYear,
-        MinNotRecoveredEndYear = source.MinNotRecoveredEndYear,
-        MaxNotRecoveredEndYear = source.MaxNotRecoveredEndYear,
-        IsAllObservationsSensitive = source.ObservationCount > 0 && source.IsAllObservationsSensitive,
-        AllObservationsArePresent = source.ObservationCount > 0 && source.AllObservationsArePresent,
-        DebugObservations = source.ObservationCount <= 5 ? source.DebugObservations?.ToList() ?? new() : null,
-        PresentationStatusSummaries = source.PresentationStatusSummaries.Select(summary => new LocationObservationSummary.PresentationStatusSummary
+        var combined = new LocationObservationSummary
         {
-            IsPresent = summary.IsPresent, IsSensitive = summary.IsSensitive, IsTreated = summary.IsTreated,
-            IsNotRecovered = summary.IsNotRecovered, EndYear = summary.EndYear, Count = summary.Count
-        }).ToList()
-    };
-
-    private static LocationObservationSummary CombineLocationObservationSummaries(IEnumerable<CachedLocationAggregate> aggregates)
-    {
-        var aggregateList = aggregates.ToList();
-        var summary = new LocationObservationSummary
-        {
-            ObservationCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.ObservationCount),
-            FoundCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.FoundCount),
-            TreatedCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.TreatedCount),
-            DiffusedCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.DiffusedCount),
-            RedlistedCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.RedlistedCount),
-            InvasiveInSwedenCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.InvasiveInSwedenCount),
-            NotRecoveredCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.NotRecoveredCount),
-            NeverFoundCount = aggregateList.Sum(aggregate => aggregate.ObservationSummary.NeverFoundCount)
+            IsAllObservationsSensitive = true,
+            AllObservationsArePresent = true
         };
+        foreach (var summary in aggregates.Select(aggregate => aggregate.ObservationSummary))
+        {
+            combined.ObservationCount += summary.ObservationCount;
+            combined.FoundCount += summary.FoundCount;
+            combined.TreatedCount += summary.TreatedCount;
+            combined.DiffusedCount += summary.DiffusedCount;
+            combined.RedlistedCount += summary.RedlistedCount;
+            combined.InvasiveInSwedenCount += summary.InvasiveInSwedenCount;
+            combined.NotRecoveredCount += summary.NotRecoveredCount;
+            combined.NeverFoundCount += summary.NeverFoundCount;
+            combined.IsAllObservationsSensitive &= summary.IsAllObservationsSensitive;
+            combined.AllObservationsArePresent &= summary.AllObservationsArePresent;
+            combined.MinPresentEndYear = Min(combined.MinPresentEndYear, summary.MinPresentEndYear);
+            combined.MaxPresentEndYear = Max(combined.MaxPresentEndYear, summary.MaxPresentEndYear);
+            combined.MinNotRecoveredEndYear = Min(combined.MinNotRecoveredEndYear, summary.MinNotRecoveredEndYear);
+            combined.MaxNotRecoveredEndYear = Max(combined.MaxNotRecoveredEndYear, summary.MaxNotRecoveredEndYear);
+        }
 
-        summary.IsAllObservationsSensitive = summary.ObservationCount > 0 &&
-                                             aggregateList.All(aggregate => aggregate.ObservationSummary.IsAllObservationsSensitive);
-        summary.AllObservationsArePresent = summary.ObservationCount > 0 &&
-                                            aggregateList.All(aggregate => aggregate.ObservationSummary.AllObservationsArePresent);
-        summary.MinPresentEndYear = aggregateList.Select(aggregate => aggregate.ObservationSummary.MinPresentEndYear).Where(year => year.HasValue).Min();
-        summary.MaxPresentEndYear = aggregateList.Select(aggregate => aggregate.ObservationSummary.MaxPresentEndYear).Where(year => year.HasValue).Max();
-        summary.MinNotRecoveredEndYear = aggregateList.Select(aggregate => aggregate.ObservationSummary.MinNotRecoveredEndYear).Where(year => year.HasValue).Min();
-        summary.MaxNotRecoveredEndYear = aggregateList.Select(aggregate => aggregate.ObservationSummary.MaxNotRecoveredEndYear).Where(year => year.HasValue).Max();
-        summary.DebugObservations = summary.ObservationCount <= 5
-            ? aggregateList.SelectMany(aggregate => aggregate.ObservationSummary.DebugObservations ?? new List<DebugObservation>()).ToList()
+        combined.IsAllObservationsSensitive &= combined.ObservationCount > 0;
+        combined.AllObservationsArePresent &= combined.ObservationCount > 0;
+        combined.DebugObservations = combined.ObservationCount <= 5
+            ? aggregates.SelectMany(aggregate => aggregate.ObservationSummary.DebugObservations ?? new List<DebugObservation>()).ToList()
             : null;
-        summary.PresentationStatusSummaries = CombinePresentationStatusSummaries(aggregateList);
-
-        return summary;
+        combined.PresentationStatusSummaries = CombinePresentationStatusSummaries(aggregates);
+        return combined;
     }
 
+    private static int? Min(int? first, int? second) =>
+        first.HasValue && second.HasValue ? Math.Min(first.Value, second.Value) : first ?? second;
+
+    private static int? Max(int? first, int? second) =>
+        first.HasValue && second.HasValue ? Math.Max(first.Value, second.Value) : first ?? second;
+
     private static List<LocationObservationSummary.PresentationStatusSummary> CombinePresentationStatusSummaries(
-        IEnumerable<CachedLocationAggregate> aggregates)
+        IEnumerable<LocationAggregate> aggregates)
     {
         return aggregates
             .SelectMany(aggregate => aggregate.ObservationSummary.PresentationStatusSummaries)
@@ -309,7 +292,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
     private readonly record struct PreparedPolygonGeometry(Geometry? Geometry, bool KeepOutsideClustering);
 
     private static Dictionary<string, PreparedPolygonGeometry> PreparePolygonGeometries(
-        IEnumerable<CachedLocationAggregate> locations, Dictionary<string, Geometry>? polygons,
+        IEnumerable<LocationAggregate> locations, Dictionary<string, Geometry>? polygons,
         CreatePolygonsMode mode, double? metersPerPixel)
     {
         var prepared = new Dictionary<string, PreparedPolygonGeometry>(StringComparer.OrdinalIgnoreCase);
@@ -318,8 +301,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         foreach (var location in locations)
         {
             if (location.Location.Type != ProcessedLocationType.Polygon) continue;
-            PreparePolygonGeometry(prepared, location.DistinctLocationId,
-                location.Locations.Count > 0 ? location.Locations : new[] { location.Location },
+            PreparePolygonGeometry(prepared, location.DistinctLocationId, location.Locations,
                 location.GeneralizedLocationIds, polygons, mode, metersPerPixel);
         }
         return prepared;

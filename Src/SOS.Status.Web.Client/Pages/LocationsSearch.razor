@@ -200,7 +200,7 @@
                         </MudStack>
                         <MudText Typo="Typo.body2"><strong>Zoom:</strong> @currentZoomLevel.ToString("F2")</MudText>
                         <MudText Typo="Typo.body2"><strong>Meter per pixel:</strong> @currentMetersPerPixelText</MudText>
-                        <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>                        
+                        <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>
                         <MudText Typo="Typo.body2"><strong>Resultat:</strong> @lastResultTypeText</MudText>
                         <MudText Typo="Typo.body2"><strong>Använd strategi:</strong> @lastAdaptiveSearchStrategyText</MudText>
                         <MudText Typo="Typo.body2"><strong>Cache:</strong> @lastCacheStatusText</MudText>
@@ -450,7 +450,7 @@
                         <MudCheckBox T="bool"
                                      Value="@showCoordinateUncertaintyCircles"
                                      ValueChanged="OnShowCoordinateUncertaintyCirclesChanged"
-                                     Label="Visa noggrannhetscirklar för visade lokaler (högst 5 per punkt)"
+                                     Label="Visa noggrannhetscirklar för visade lokaler"
                                      Color="Color.Primary"
                                      Dense="true" />
 
@@ -504,93 +504,30 @@
 
                 <MudExpansionPanel Text="Teckenförklaring">
                     <MudStack Spacing="2">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="width: 22px; height: 14px; border: 2px dashed #00695c; display: inline-block;"></span>
+                        <div class="map-legend-row">
+                            <span class="map-legend-symbol map-legend-symbol--filter-area"></span>
                             <MudText Typo="Typo.body2">Sökfiltrets konturer</MudText>
                         </div>
-                        <MudText Typo="Typo.subtitle2">Punktlokaler och polygonlokaler</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: yellow; border: 1px solid rgba(0,0,0,0.55); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Present</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #d7191c; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #f97316; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Treated</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #8a8a8a; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotRecovered</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: black; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotPresent</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #ff69b4; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: dodgerblue; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Cluster</MudText>
-                            </div>
-                        </MudStack>
-
-                        <MudDivider />
-
-                        <MudText Typo="Typo.subtitle2">Diffuserade lokaler</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,0,0,0.20); border: 2px solid rgba(180,0,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Present</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(120,0,0,0.34); border: 2px solid rgba(95,0,0,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(249,115,22,0.32); border: 2px solid rgba(194,65,12,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Treated</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(128,128,128,0.30); border: 2px solid rgba(92,92,92,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotRecovered</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(0,0,0,0.30); border: 2px solid rgba(0,0,0,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotPresent</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,105,180,0.30); border: 2px solid rgba(214,51,132,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
-                            </div>
-                        </MudStack>
-
-                        <MudDivider />
-
-                        <MudText Typo="Typo.subtitle2">Gridrutor</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,213,128,0.60); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Få observationer</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,145,0,0.66); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Medel</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(220,38,38,0.72); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Många observationer</MudText>
-                            </div>
-                        </MudStack>
+                        @foreach (var section in MapLegendSections)
+                        {
+                            @if (section != MapLegendSections[0])
+                            {
+                                <MudDivider />
+                            }
+                            <MudText Typo="Typo.subtitle2">@section.Title</MudText>
+                            <MudStack Spacing="1">
+                                @foreach (var item in section.Items)
+                                {
+                                    <div class="map-legend-row">
+                                        <span class="map-legend-symbol @section.SymbolClass" style="background: @item.Fill; border-color: @item.Border;"></span>
+                                        <MudText Typo="Typo.body2">@item.Label</MudText>
+                                    </div>
+                                }
+                            </MudStack>
+                        }
                     </MudStack>
                 </MudExpansionPanel>
             </MudExpansionPanels>
         </MudItem>
     </MudGrid>
 </MudStack>
-

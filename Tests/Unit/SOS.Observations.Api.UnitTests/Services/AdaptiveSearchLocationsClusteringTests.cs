@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
@@ -35,9 +35,11 @@ public class AdaptiveSearchLocationsClusteringTests
             });
         var task = fixture.Service.SearchAsync(new AdaptiveSearchLocationsRequest
         {
-            Filter = new() { ProtectionFilter = ProtectionFilterDto.Public }, CancellationToken = cts.Token,
+            Filter = new() { ProtectionFilter = ProtectionFilterDto.Public },
+            CancellationToken = cts.Token,
             AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-            ObservationsLimit = 1000, InputBbox = Bbox, Bbox = Bbox
+            ObservationsLimit = 1000,
+            InputBbox = Bbox
         });
         cts.Cancel();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
@@ -87,9 +89,9 @@ public class AdaptiveSearchLocationsClusteringTests
     public static IEnumerable<object[]> SearchCases()
     {
         foreach (var strategy in new[] { AdaptiveSearchLocationsStrategy.ObservationsThenGrid, AdaptiveSearchLocationsStrategy.Auto })
-        foreach (var (resolution, cutoff, clustered) in new (double?, double, bool)[]
-                 { (1, 2, false), (2, 2, false), (2.01, 2, true), (1, 0, true), (3, 4, false), (null, 2, true) })
-            yield return [strategy, resolution, cutoff, clustered];
+            foreach (var (resolution, cutoff, clustered) in new (double?, double, bool)[]
+                     { (1, 2, false), (2, 2, false), (2.01, 2, true), (1, 0, true), (3, 4, false), (null, 2, true) })
+                yield return [strategy, resolution, cutoff, clustered];
     }
 
     [Theory]
@@ -258,8 +260,8 @@ public class AdaptiveSearchLocationsClusteringTests
     public static IEnumerable<object[]> DetailClusteringSearchCases()
     {
         foreach (var strategy in new[] { AdaptiveSearchLocationsStrategy.ObservationsThenGrid, AdaptiveSearchLocationsStrategy.Auto })
-        foreach (var (resolution, minimum, radius) in new[] { (1d, 0, 2d), (3d, 3, 6d), (3d, 4, 6d), (3d, 2, 1500d) })
-            yield return [strategy, resolution, minimum, radius];
+            foreach (var (resolution, minimum, radius) in new[] { (1d, 0, 2d), (3d, 3, 6d), (3d, 4, 6d), (3d, 2, 1500d) })
+                yield return [strategy, resolution, minimum, radius];
     }
 
     [Theory]
@@ -326,15 +328,24 @@ public class AdaptiveSearchLocationsClusteringTests
     private static AdaptiveSearchLocationsRequest Request(double? resolution, double cutoff = 2, bool cluster = true,
         double? meterRadius = null, AdaptiveSearchLocationsStrategy strategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
         int minimumCount = 0, bool samples = false, double detailRadiusPx = 0, double clusterRadiusPx = 500) => new()
-    {
-        Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
-        AdaptiveSearchStrategy = strategy, ObservationsLimit = 1000, MaxGridCells = 100, MaxZoom = 21,
-        InputBbox = Bbox, Bbox = Bbox, Cluster = cluster, ClusterRadiusMeters = meterRadius,
-        MetersPerPixel = resolution, SwitchToDetailClusteringAtMetersPerPixel = cutoff, ClusterRadiusPx = clusterRadiusPx,
-        DetailClusterRadiusPx = detailRadiusPx,
-        MinLocationsPerCluster = 2, MinimumLocationCountBeforeClustering = minimumCount,
-        UseCache = true, CreateSampleObservations = samples
-    };
+        {
+            Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
+            AdaptiveSearchStrategy = strategy,
+            ObservationsLimit = 1000,
+            MaxGridCells = 100,
+            MaxZoom = 21,
+            InputBbox = Bbox,
+            Cluster = cluster,
+            ClusterRadiusMeters = meterRadius,
+            MetersPerPixel = resolution,
+            SwitchToDetailClusteringAtMetersPerPixel = cutoff,
+            ClusterRadiusPx = clusterRadiusPx,
+            DetailClusterRadiusPx = detailRadiusPx,
+            MinLocationsPerCluster = 2,
+            MinimumLocationCountBeforeClustering = minimumCount,
+            UseCache = true,
+            CreateSampleObservations = samples
+        };
 
     private sealed class Fixture
     {
@@ -350,7 +361,8 @@ public class AdaptiveSearchLocationsClusteringTests
                 {
                     ["location"] = new JsonObject
                     {
-                        ["locationId"] = $"site-{locationIndex}", ["type"] = 0,
+                        ["locationId"] = $"site-{locationIndex}",
+                        ["type"] = 0,
                         ["decimalLongitude"] = pairOffset.HasValue
                             ? 15 + locationIndex / 2 * spacing + locationIndex % 2 * pairOffset.Value
                             : 15 + (coincident && locationIndex == 1 ? 0 : locationIndex) * spacing,
@@ -383,14 +395,14 @@ public class AdaptiveSearchLocationsClusteringTests
 
     private sealed class MemoryCache : IAdaptiveSearchLocationsCache
     {
-        private List<CachedLocationAggregate>? _locations;
+        private List<LocationAggregate>? _locations;
         public string CreateCacheKey(int? roleId, string? application, bool sensitive, SearchFilterInternalDto filter) => "locations";
-        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false)
         {
             locations = _locations ?? [];
             return _locations != null;
         }
-        public void Set(string key, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations) => _locations = locations;
-        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => Bbox;
+        public void Set(string key, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations) => _locations = locations;
+        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations) => Bbox;
     }
 }

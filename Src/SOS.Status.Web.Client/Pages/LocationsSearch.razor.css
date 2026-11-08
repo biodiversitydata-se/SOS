@@ -25,9 +25,9 @@
     padding-left: 22px;
 }
 
-.selected-feature-hit-list li {
-    margin-bottom: 8px;
-}
+    .selected-feature-hit-list li {
+        margin-bottom: 8px;
+    }
 
 .selected-feature-list-text {
     margin-top: 2px;
@@ -91,4 +91,36 @@
     border: 1px solid black;
     border-radius: 50%;
     background: #bdbdbd;
+}
+
+.map-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-legend-symbol {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-style: solid;
+}
+
+.map-legend-symbol--point {
+    border-width: 1px;
+    border-radius: 50%;
+}
+
+.map-legend-symbol--diffused {
+    border-width: 2px;
+}
+
+.map-legend-symbol--grid {
+    border-width: 1px;
+}
+
+.map-legend-symbol--filter-area {
+    width: 22px;
+    border: 2px dashed #00695c;
 }

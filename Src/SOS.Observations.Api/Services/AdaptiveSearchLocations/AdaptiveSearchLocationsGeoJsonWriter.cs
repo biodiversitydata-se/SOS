@@ -1,15 +1,14 @@
 ﻿using SOS.Api.Contracts.Common.Geo;
-﻿using NetTopologySuite.Geometries;
 using Microsoft.AspNetCore.Http;
 using SOS.Api.Contracts.Observations.Responses;
 using NetTopologySuite.Features;
 using SOS.Lib.Enums;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Search.Result;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Nodes;
 using System.Text.Unicode;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
@@ -52,22 +51,8 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         IReadOnlyList<FilterAreaReferenceDto>? filterAreaReferences = null)
     {
         await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
-        jsonWriter.WriteStartObject();
-        jsonWriter.WriteString("type", "FeatureCollection");
-        WriteGeoJsonBbox(jsonWriter, bbox);
-        jsonWriter.WritePropertyName("filterAreaReferences");
-        JsonSerializer.Serialize(jsonWriter, filterAreaReferences ?? Array.Empty<FilterAreaReferenceDto>(), JsonSerializerOptions);
-        jsonWriter.WritePropertyName("features");
-        jsonWriter.WriteStartArray();
-
-        if (geographicAreas != null)
-        {
-            foreach (var geographicArea in geographicAreas)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                WriteGeographicAreaFeature(jsonWriter, geographicArea);
-            }
-        }
+        WriteFeatureCollectionStart(jsonWriter, bbox, filterAreaReferences);
+        WriteGeographicAreaFeatures(jsonWriter, geographicAreas, cancellationToken);
 
         // Emit drawing order: surfaces (largest first), lines, then points and clusters.
         // LINQ evaluates each area key once; equal keys retain their original order.
@@ -95,19 +80,70 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
             jsonWriter.WriteEndObject();
         }
 
+        await WriteFeatureCollectionEndAsync(jsonWriter, response, cancellationToken);
+    }
+
+    public static async Task WriteGeogridFeatureCollectionAsync(
+        GeoGridTileResult gridResult,
+        LatLonBoundingBoxDto? bbox,
+        HttpResponse response,
+        List<Feature>? geographicAreas = null,
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<FilterAreaReferenceDto>? filterAreaReferences = null)
+    {
+        await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
+        WriteFeatureCollectionStart(jsonWriter, bbox, filterAreaReferences);
+
+        foreach (var gridCellTile in gridResult.GridCellTiles ?? Enumerable.Empty<GridCellTile>())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            WriteGeographicAreaFeature(jsonWriter, gridCellTile.GetFeature(CoordinateSys.WGS84));
+        }
+
+        WriteGeographicAreaFeatures(jsonWriter, geographicAreas, cancellationToken);
+        await WriteFeatureCollectionEndAsync(jsonWriter, response, cancellationToken);
+    }
+
+    private static void WriteFeatureCollectionStart(
+        Utf8JsonWriter jsonWriter,
+        LatLonBoundingBoxDto? bbox,
+        IReadOnlyList<FilterAreaReferenceDto>? filterAreaReferences)
+    {
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "FeatureCollection");
+        WriteGeoJsonBbox(jsonWriter, bbox);
+        jsonWriter.WritePropertyName("filterAreaReferences");
+        JsonSerializer.Serialize(jsonWriter, filterAreaReferences ?? Array.Empty<FilterAreaReferenceDto>(), JsonSerializerOptions);
+        jsonWriter.WritePropertyName("features");
+        jsonWriter.WriteStartArray();
+    }
+
+    private static async Task WriteFeatureCollectionEndAsync(
+        Utf8JsonWriter jsonWriter,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
         jsonWriter.WriteEndArray();
         jsonWriter.WriteEndObject();
         await jsonWriter.FlushAsync(cancellationToken);
         await response.BodyWriter.FlushAsync(cancellationToken);
     }
 
-    internal static string AddFilterAreaReferences(string? geoJson, IReadOnlyList<FilterAreaReferenceDto> references)
+    private static void WriteGeographicAreaFeatures(
+        Utf8JsonWriter jsonWriter,
+        List<Feature>? geographicAreas,
+        CancellationToken cancellationToken)
     {
-        var root = string.IsNullOrWhiteSpace(geoJson)
-            ? new JsonObject { ["type"] = "FeatureCollection", ["features"] = new JsonArray() }
-            : JsonNode.Parse(geoJson)!.AsObject();
-        root["filterAreaReferences"] = JsonSerializer.SerializeToNode(references, JsonSerializerOptions);
-        return root.ToJsonString();
+        if (geographicAreas == null)
+        {
+            return;
+        }
+
+        foreach (var geographicArea in geographicAreas)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            WriteGeographicAreaFeature(jsonWriter, geographicArea);
+        }
     }
 
     private static void WriteGeographicAreaFeature(Utf8JsonWriter jsonWriter, Feature feature)
