@@ -64,6 +64,8 @@ All fields that are part of an observation are listed on this page.
 | occurrence.reportedBy 	| string 	| "Dennis Alnér" 	| Name of the person that reported the species observation.    	|  	|
 | occurrence.reportedDate 	| string 	| "2011-10-28T06:51:00Z" 	| Date and time when the species observation was reported (UTC).    	|  	|
 | occurrence.occurrenceStatus 	| VocabularyValue[\<occurrenceStatus\>](Vocabularies.md#occurrenceStatus)	| \{ "id":0, "value":"present" \}	| A statement about the presence or absence of a Taxon at a Location. 	| https://dwc.tdwg.org/terms/#dwc:occurrenceStatus 	|
+| occurrence.invasiveSpeciesTreatment | VocabularyValue[\<invasiveSpeciesTreatment\>](Vocabularies.md#invasivespeciestreatment) | \{ "id":6, "value":"Uppföljning (Mekanisk)" \} | The registered invasive species treatment or follow-up. | |
+| occurrence.sensitivityReason | int32? | 1 | Reason why the occurrence is protected. Uses SensitivityReason enum. | |
 | occurrence.activity 	| VocabularyValue[\<activity\>](Vocabularies.md#activity)	| \{ "id":25, "value":"födosökande" \} | A description of the activity shown by the subject at the time the   Occurrence was recorded. 	|  	|
 | occurrence.behavior 	| VocabularyValue[\<behavior\>](Vocabularies.md#behavior)	| \{ "id":17, "value":"permanent revir" \} | A description of the behavior shown by the subject at the time the   Occurrence was recorded. 	| https://dwc.tdwg.org/terms/#dwc:behavior 	|
 | occurrence.biotope 	| VocabularyValue[\<biotope\>](Vocabularies.md#biotope)	| \{ "id":509, "value":"Vattenstrand" \} | Biotope. 	|  	|
