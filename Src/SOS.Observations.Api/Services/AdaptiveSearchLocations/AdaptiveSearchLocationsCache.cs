@@ -1,4 +1,4 @@
-using SOS.Api.Contracts.Common.Geo;
+﻿using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Gis;
 using SOS.Observations.Api.Helpers;
@@ -9,14 +9,14 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 internal interface IAdaptiveSearchLocationsCache
 {
     string CreateCacheKey(int? roleId, string? authorizationApplicationIdentifier, bool sensitiveObservations, SearchFilterInternalDto filter);
-    bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false);
-    void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations);
-    LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations);
+    bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false);
+    void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations);
+    LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations);
 }
 
 internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCache
 {
-    internal const string CacheKeyPrefix = "adaptive-search-locations:v6:";
+    internal const string CacheKeyPrefix = "adaptive-search-locations:v7:";
     internal const int MaxEntriesPerKey = 8;
     internal const int MaxLocationsPerBucket = 10000;
     internal static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
@@ -42,7 +42,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
     {
         var cacheKeyParameters = new[]
         {
-            "version=6",
+            "version=7",
             $"roleId={roleId}",
             $"authorizationApplicationIdentifier={authorizationApplicationIdentifier}",
             $"sensitiveObservations={sensitiveObservations}"
@@ -51,9 +51,9 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         return $"{CacheKeyPrefix}{hash}";
     }
 
-    public bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+    public bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false)
     {
-        locations = new List<CachedLocationAggregate>();
+        locations = new List<LocationAggregate>();
         var cachedBucket = _cache.TryGet<AdaptiveSearchLocationsCacheBucket>(cacheKey);
         var bucket = cachedBucket.HasValue ? cachedBucket.Value : null;
         if (bucket?.Entries?.Any() != true)
@@ -78,7 +78,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         // deduplicate observations, even when the underlying LocationIds are globally unique.
         var cacheEntry = activeEntries.FirstOrDefault(entry =>
             ContainsBoundingBox(entry.BoundingBox, requestedBbox) &&
-            entry.Locations.All(location => location.LocationIds.Count <= 1));
+            entry.Locations.All(location => location.Locations.Count <= 1));
         if (cacheEntry == null) return false;
 
         // A summary combining multiple LocationIds may straddle the new bbox after coordinate rounding.
@@ -86,7 +86,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         return true;
     }
 
-    public void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations)
+    public void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations)
     {
         if (locations.Count > MaxLocationsPerBucket)
         {
@@ -134,7 +134,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         }
     }
 
-    public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations)
+    public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations)
     {
         double? left = null;
         double? top = null;
@@ -198,8 +198,8 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         int SizeUnitsBefore,
         int SizeUnitsAfter);
 
-    private static IEnumerable<CachedLocationAggregate> FilterByBoundingBox(
-        IEnumerable<CachedLocationAggregate> locations,
+    private static IEnumerable<LocationAggregate> FilterByBoundingBox(
+        IEnumerable<LocationAggregate> locations,
         LatLonBoundingBoxDto? bbox)
     {
         if (bbox?.TopLeft == null || bbox.BottomRight == null)

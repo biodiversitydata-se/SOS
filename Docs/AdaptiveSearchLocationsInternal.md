@@ -63,16 +63,16 @@ Lokalresultat grupperas i denna ordning:
 
 | Pixelsteg | När det används | Sökradie |
 |---|---|---|
-| Vanlig pixelklustring | Zoomgränsen och antalsgränsen tillåter det. | Börjar vid `metersPerPixel × clusterRadiusPx` meter och kan växa mot målet 400 kartobjekt. |
-| Liten pixelgruppering | Zoom- eller antalsgränsen stoppar det vanliga steget. | Exakt `metersPerPixel × proximityClusterRadiusPx` meter, utan radieökning. |
+| Vanlig pixelklustring | Zoomgränsen och antalsgränsen tillåter det. | Fast sökradie på `metersPerPixel × clusterRadiusPx` meter, utan radieökning. |
+| Detaljklustring | Zoom- eller antalsgränsen stoppar det vanliga steget. | Fast sökradie på `metersPerPixel × detailClusterRadiusPx` meter, utan radieökning. |
 
-När `metersPerPixel` anges kräver vanlig pixelklustring `metersPerPixel > disablePixelClusteringAtMetersPerPixel`, om zoomgränsen inte är `0`. Antalet klustringsbara kartobjekt måste också vara **större än** `minLocationCountBeforeClustering`, räknat efter metersteget och utan separata polygoner.
+När `metersPerPixel` anges kräver vanlig pixelklustring `metersPerPixel > switchToDetailClusteringAtMetersPerPixel`, om zoomgränsen inte är `0`. Antalet klustringsbara kartobjekt måste också vara **större än** `minLocationCountBeforeClustering`, räknat efter metersteget och utan separata polygoner.
 
-Med standardvärdena börjar vanlig pixelklustring vid 20 px när upplösningen är 5 m/px, alltså 100 meter. Vid 1 m/px används i stället den fasta radien 10 px, alltså 10 meter. Zoomgränsen 2 m/px väljer pixelsteg; den anger ingen radie.
+Med standardvärdena använder vanlig pixelklustring den fasta radien 20 px när upplösningen är 5 m/px, alltså 100 meter. Vid 1 m/px används i stället den fasta radien 10 px, alltså 10 meter. Zoomgränsen 2 m/px väljer pixelsteg; den anger ingen radie.
 
-Utan `metersPerPixel` beräknas vanlig klustringsradie från bbox och resultatets utbredning. Zoomgränsen och liten pixelgruppering används då inte. `cluster=false` stänger av båda pixelstegen. `proximityClusterRadiusPx=0` stänger av enbart den lilla grupperingen.
+Utan `metersPerPixel` beräknas vanlig klustringsradie från bbox och resultatets utbredning och kan öka mot målet 400 kartobjekt. Zoomgränsen och detaljklustring används då inte. `cluster=false` stänger av båda pixelstegen. `detailClusterRadiusPx=0` stänger av enbart detaljklustringen.
 
-`minLocationsPerCluster` gäller alla kluster och räknar geografiska grupper; sammanfallande lokal-id:n räknas som en grupp. Metergrupper delas inte av pixelsteget. Radierna är sökradier, inte maximal klusterutbredning: närliggande grupper kan slås ihop. Den fasta pixelradien kan därför lämna fler än 400 kartobjekt.
+`minLocationsPerCluster` gäller alla kluster och räknar geografiska grupper; sammanfallande lokal-id:n räknas som en grupp. Metergrupper delas inte av pixelsteget. Radierna är sökradier, inte maximal klusterutbredning: närliggande grupper kan slås ihop. Med `metersPerPixel` kan båda pixelstegen lämna fler än 400 kartobjekt; sökradien ökas inte för att minska antalet. Växling till geogrid styrs fortfarande av sökstrategin och gränserna för observationer och lokaler före klustring, inte av antalet kartobjekt efter klustring.
 
 Lämna `clusterRadiusMeters` tom för enbart zoomstyrd klustring. Metersteget används när du också behöver en fast sökradie i meter.
 
@@ -96,6 +96,8 @@ Svaret är en GeoJSON `FeatureCollection`. Sökningar utan träffar, även efter
 
 Lokaler kan ha punkt- eller polygongeometri. Kluster är punkter vid klustrets mittpunkt. Använd `groupingType` för att identifiera kluster; `cluster` innehåller metadata och `presentation.status` styr presentationen.
 
+Lokalfeatures returneras i ritordning: ytor först, därefter linjer och sist punkter och kluster. Ytor sorteras fallande efter geometrins plana area i svarets WGS84-koordinater, så att mindre polygoner kan ritas ovanpå större. Polygonhål dras av och MultiPolygon använder delpolygonernas sammanlagda area. Arean beräknas en gång per geometri vid sorteringen; objekt med samma geometri-dimension och area behåller sin inbördes ordning. Sorteringen görs när svaret skrivs och gäller även cacheträffar och representativa lokaler. Inbäddade filterområden ligger före lokalfeatures; geogridens ordning ändras inte.
+
 | Property | Betydelse |
 |---|---|
 | `groupingType` | `singleLocation`, `coLocatedLocations`, `meterCluster` eller `pixelCluster`. De två sista är kluster. |
@@ -103,13 +105,58 @@ Lokaler kan ha punkt- eller polygongeometri. Kluster är punkter vid klustrets m
 | `observationCount` | Totalt antal matchande observationer, även när representanter används. |
 | `presentation` | Kartstatus, statusräknare, brytårsstatus och känslighetsinformation. |
 | `observationSummary` | Antal taxa och delräknare för observationer. |
-| `locations` | Fullständiga `count` och `ids`; `items` innehåller högst fem lokaler, sorterade efter id. |
+| `locations` | Fullständiga `count` och `ids`; `items` begränsas av `AdaptiveSearchFeatureLocationsDto.MaxLocationItems` (standard 100 lokaler per feature), sorterade efter id. |
 | `cluster.radiusMeters` | Använd sökradie i meter. |
 | `cluster.radiusMetersMin` | Ungefärlig radie kring klusterpunkten som omsluter medlemspositionerna, utan osäkerhetsytor. |
 
-Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Begränsningen till fem `items` gäller bara lokalernas metadata.
+Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Gränsen för `items` gäller bara lokalernas metadata, inte klusteridentitet eller beräkning av polygongeometri.
 
-Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area` eller `FilterArea.OwnPolygon`. De har andra properties än lokalfeatures.
+Antalet lokaldetaljer styrs på ett enda ställe: `public const int MaxLocationItems = 100` i [AdaptiveSearchLocationFeaturePropertiesDto.cs](../Src/SOS.Api.Contracts/Observations/Responses/AdaptiveSearchLocationFeaturePropertiesDto.cs), i klassen `AdaptiveSearchFeatureLocationsDto`. För att testa större svar, ändra exempelvis konstanten till `200`, bygg om observations-API:t och starta den uppdaterade API-instansen. Gränsen gäller varje kartobjekt, även vid cacheträffar. Ett kluster med 150 lokaler kan då innehålla alla 150 detaljer, medan ett kluster med fler än 200 lokaler fortfarande har fullständiga `ids` och `count` men högst 200 `items`. Jämför svarsstorlek och svarstid med samma filter, bbox, zoom och cacheläge. Återställ konstanten till 100 och bygg om API:t efter testet. Dropdownen använder automatiskt de namn som följer med i `items`; observationstabellens separata gräns på fem observationer påverkas inte.
+
+Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area`, `FilterArea.OwnPolygon` eller `FilterArea.Polygon` för en sökcirkel. De har andra properties än lokalfeatures.
+
+### Filterytor utan upprepad överföring
+
+Alla svar från `AdaptiveSearchLocationsInternal` innehåller `filterAreaReferences` på FeatureCollection-nivå, även när `includeFilterAreasInResult=false`. Det gäller lokalresultat, cacheträffar, tomma resultat och geogrid. Utan geografiska filter är listan tom. Referenserna är metadata och ingår inte i `X-Feature-Count`.
+
+```json
+{
+  "type": "FeatureCollection",
+  "filterAreaReferences": [
+    {
+      "featureType": "FilterArea.Area",
+      "areaType": "County",
+      "featureId": "1",
+      "geometryUrl": "/areas/County/1/geometry"
+    },
+    {
+      "featureType": "FilterArea.OwnGeometries"
+    }
+  ],
+  "features": []
+}
+```
+
+Exemplet visar bara relevanta fält; övriga referensfält kan vara `null`. `geometryUrl` är relativ till API:ts origin och inkluderar eventuell `PathBase`. Vid ett separat webb-/proxyursprung ska länken därför lösas mot observations-API:t. Argumenten `areaType` och `featureId` kan alltid användas för att bygga anropet mot klientens konfigurerade API-basadress. Länkarna gäller oberoende av kartans bbox och zoom. Dubbletter av samma områdestyp/id ger en referens.
+
+Hämta lagrade områden med:
+
+```http
+GET /areas/County/1/geometry
+Accept: application/geo+json
+```
+
+Svaret är en GeoJSON Feature i WGS84 utan ZIP-arkiv, med samma områdesmetadata som en inbäddad `FilterArea.Area`. Vanlig HTTP-komprimering kan användas. Ingen klippning eller förenkling görs. Okänt område eller saknad geometri ger `404`; ogiltig områdestyp ger `400`.
+
+Endpointen returnerar `Cache-Control: public, max-age=3600` och en innehållsbaserad svag `ETag`. Spara validatorn tillsammans med geometrin. Vid omvalidering skickas den som `If-None-Match`; `304 Not Modified` saknar kropp och betyder att klientens tidigare geometri ska återanvändas. Både `200` och `304` innehåller cachehuvudena. Geometri och områdesmetadata hämtas via `AreaManager` från den befintliga `IAreaCache`. GeoJSON och ETag beräknas för varje anrop som når API:t, även vid `304`, och sparas inte i någon separat servercache. HTTP-cachen och kartans återanvändning minskar antalet sådana anrop. Underliggande områdescache påverkar när ändringar i källdatat blir tillgängliga; dess geometridictionary har ingen tidsbaserad utgång.
+
+Egna geometrier lagras inte av sökanropet och får därför ingen serverlänk. En enda referens av typen `FilterArea.OwnGeometries` representerar hela listan i den ursprungliga begärans `geographics.geometries`, oavsett antalet geometrier. Klienten läser listan och ritar geometrierna som separata features i samma konturlager. Polygoner och MultiPolygon behåller sina koordinater och hål; ingen sammanslagning eller geometrisk union görs och sökfiltret ändras inte.
+
+För sökcirklar behålls den befintliga hanteringen: om den första geometrin är en punkt och `maxDistanceFromPoint` är positivt, returneras i stället en `FilterArea.Polygon`-referens till den första punkten med det ursprungliga `maxDistanceFromPoint`. Bara den cirkeln visas då, precis som för inbäddade filterytor. Klienten har redan koordinaterna och kan behålla dem utan att de skickas tillbaka. En tom geometrielista ger ingen egen referens. Kartans bbox skapar ingen egen filterreferens.
+
+Behåll filterytorna i ett separat kartlager och använd normalt `includeFilterAreasInResult=false` under zoom och panorering. Låt lagrade områdens typ/id styra klientcachen. Flaggan `true` fungerar fortfarande för klienter som vill ha geometrierna inbäddade i varje söksvar. Egna polygoner skickas fortfarande i sökbegäran; den här ändringen inför inget lagrat geometri-id för sökning.
+
+I .NET-klienten finns `ISosAreasClient.GetAreaGeometryAsync(areaType, featureId, ifNoneMatch, cancellationToken)`. Resultatet innehåller `GeoJson`, `ETag` och `NotModified`. Läs filterreferenserna ur söksvarets `GeoJson`, exempelvis med `JsonDocument` och kontraktet `FilterAreaReferenceDto`.
 
 ### Hur exakta är värdena?
 
@@ -188,7 +235,7 @@ Ogiltiga parametervärden ger HTTP 400.
 | `returnInputBBox` | `false` | `true`/`false` | Returnerar inmatad bbox i stället för resultatets utbredning. |
 | `sensitiveObservations` | `false` | `true`/`false` | Väljer skyddade/publika fynd när `filter.protectionFilter` saknas. |
 | `cutoffYear` | `null` | Heltal | Delar presentationen före och från och med året; ändrar inte sökfiltret. |
-| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till filterområden som separata features. |
+| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till filtergeometrier som separata features. `filterAreaReferences` returneras även vid `false`. |
 | `useCache` | `true` | `true`/`false` | Tillåter läsning och skrivning i lokalcachen. |
 | `createSampleObservations` | `false` | `true`/`false` | Felsökningsdata för kartsymboler; `Auto` väljer observationsvägen. |
 
@@ -199,9 +246,9 @@ Ogiltiga parametervärden ger HTTP 400.
 | `cluster` | `true` | `true`/`false` | Aktiverar de två alternativa pixelstegen. |
 | `clusterRadiusMeters` | `null` | Positivt ändligt tal | Fast metersteg före pixelsteget, även vid `cluster=false`. |
 | `metersPerPixel` | `null` | Positivt ändligt tal | Kartupplösning i markmeter per CSS-pixel. |
-| `clusterRadiusPx` | `20` | `1`–`500` | Startradie för vanlig pixelklustring, i CSS-pixlar. |
-| `disablePixelClusteringAtMetersPerPixel` | `2.0` | Icke-negativt ändligt tal | Stoppar vanligt pixelsteg vid upplösning ≤ gränsen. `0` tar bort zoomgränsen. |
-| `proximityClusterRadiusPx` | `10.0` | Ändligt tal `0`–`500` | Fast pixelradie när vanligt steg stoppas. `0` stänger av den lilla grupperingen. |
+| `clusterRadiusPx` | `20` | `1`–`500` | Fast sökradie för vanlig pixelklustring i CSS-pixlar när `metersPerPixel` anges. Kan ge fler än 400 kartobjekt. Ingen garanti för maximal klusterutbredning. |
+| `switchToDetailClusteringAtMetersPerPixel` | `2.0` | Icke-negativt ändligt tal | Växlar från vanlig pixelklustring till detaljklustring vid upplösning ≤ gränsen. `0` stänger av zoomväxlingen. |
+| `detailClusterRadiusPx` | `10.0` | Ändligt tal `0`–`500` | Fast sökradie i pixlar för detaljklustring när zoom- eller antalsgränsen stoppar vanlig pixelklustring. `0` stänger av detaljklustringen. |
 | `minLocationCountBeforeClustering` | `0` | `0`–`10000` | Vanligt pixelsteg tillåts över detta antal klustringsbara kartobjekt. |
 | `minLocationsPerCluster` | `2` | `2`–`100` | Minsta antal geografiska grupper per kluster. |
 | `createPolygons` | `No` | `No`, `Yes`, `WhenNeeded` | Polygonläge enligt tabellen ovan. |
@@ -233,6 +280,28 @@ Första sökningen startas med **Sök**. Därefter kan panorering och zoom söka
 
 Vid pan/zoom med samma filter behålls markeringen och observationslistan. Tabellen byter innehåll först när nya observationer har hämtats. Ett ändrat filter återställer markeringen. Klick på en punkt prioriteras framför en underliggande polygon.
 
+Markering och avmarkering lämnar alltid kartutsnittet oförändrat. Det gäller kartklick, lokal-dropdownen och observationstabellens kryssrutor, även för polygoner som sträcker sig utanför kartutsnittet. Markering uppdaterar objektens stil och kan hämta observationer för urvalet, men anpassar inte kartans centrum eller zoom och startar därför ingen kartsökning genom en automatisk kartförflyttning. Manuell panorering och zoomning, inklusive dubbelklickszoom, fungerar som tidigare och kan utlösa automatisk kartsökning.
+
+När kartresultatet är **geogrid** används klick på en gridruta för navigering: kartan anpassas till rutans utbredning med lite marginal. Rutan markeras inte som en lokal och klicket hämtar inte observationer direkt. Med **Sök automatiskt vid pan/zoom** aktiverat kan det nya kartutsnittet utlösa en ny kartsökning enligt samma regler som annan zoomning. Om automatisk sökning är avstängd används **Sök** efter inzoomningen. Dubbelklick behåller kartans vanliga dubbelklickszoom.
+
+Under **Visning → Hovring** finns tre lägen för klickbara punkter, polygoner, kluster och gridrutor:
+
+- **Visa annan muspekare när man hovrar över** visar pekfinger över objektet och vanlig pil över kartbakgrunden.
+- **Samma muspekare men tillfällig röd kontur** (standard) visar en enda cirkelyta runt punktobjekt med röd kant (2 px) och svagt gul fyllnad (`rgba(255, 235, 59, 0.12)`). Polygoner och gridrutor behåller en röd kontur utan fyllnad. Muspekaren är alltid en vanlig pil, även vid panorering. Hovringsytan ritas i ett separat, icke-interaktivt lager och ändrar inte klickurval, ordinarie stil eller observationstabell.
+- **Inget** behåller vanlig pil och visar ingen hovringsmarkering.
+
+**Visning → Visa tooltip vid hovring** är avstängd som standard och fungerar oberoende av dessa tre lägen, även med **Inget**. Tooltipen visar lokalnamn och antal observationer samt positiv `coordinateUncertaintyInMeters` för enskilda punktlokaler (datavärdet, utan visuell minimiförstoring). Kluster och sammanfallande lokaler visar totalt antal fyndplatser och observationer. Kluster visar dessutom *Zooma in för att välja en fyndplats* i kursiv stil; sammanfallande lokaler visar högst tre medföljande lokalnamn som exempel. Antalet fyndplatser följer hela `locations.count`, även när `items` är beskuren. Saknade namn ersätts med lokal-id eller ”Fyndplats”. Gridrutor visar antalet observationer och ”Klicka för att zooma in”. Tal formateras på svenska; okända eller ogiltiga värden utelämnas och ett känt nollantal visas.
+
+Tooltipen visas efter 200 ms över samma objekt och följer muspekaren med cirka 12 px avstånd, inom kartans kanter med minst 8 px marginal. Den delar befintlig träffkontroll med hovringsmarkeringen och gör inga API-anrop. Texten byggs bara när objektet ändras och visas som vanlig text, även om ett lokalnamn innehåller HTML-liknande tecken. Tooltipen fångar inga klick, ändrar inte kartutsnitt eller klickurval och döljs vid bland annat tom träff, objektbyte, kartkontroller, panorering, zoomning, nytt resultat och avstängning. Väntande visning avbryts samtidigt. Aktiveringen gäller bara tills sidan öppnas på nytt. Med både tooltip avstängd och hovringsläget **Inget** körs ingen hovringskontroll.
+
+Lägesbyten gäller direkt utan ny sökning. Konturen tas bort när musen lämnar objektet eller kartan, vid panorering/zoomning, nytt kartresultat och lägesbyte. Filterkonturer och andra icke-interaktiva hjälplager ger ingen hovringsåterkoppling.
+
+För oklustrade punktlokaler används största giltiga `coordinateUncertaintyInMeters` bland medföljande `locations.items` som **radie i meter**, centrerad på den visade punkten. Om en ovanlig grupp av sammanfallande lokaler har en beskuren detaljlista kan bara de medföljande radierna användas. Meter- och pixelkluster använder i stället `cluster.radiusMetersMin`, som omsluter medlemspositionerna utan deras noggrannhetsytor; varken klustringens sökradie eller medlemsnoggrannheter används. Saknad, noll, negativ eller ogiltig radie ger en yta vid punktsymbolens synliga ytterkontur. Även giltiga små radier förstoras visuellt till denna minsta storlek, inklusive förstoring vid klickmarkering. Det innebär ingen förändring av den lagrade noggrannheten.
+
+Cirklarna beräknas geodetiskt och kartans markupplösning vid punkten används för minsta storleken. Stora radier begränsas inte till kartutsnittet: fyllnaden syns även när ytterkanten ligger utanför kartan. Ingen extra ring läggs runt punkten. Endast den aktuella hovringsgeometrin behålls; den beräknas vid nytt hovrat objekt eller ändrad symbolstorlek och vid nästa hovring efter zoom. Den fyllda ytan är inte själv klickbar och kan inte hålla hovringen aktiv när musen lämnar punktsymbolen.
+
+Hovringen använder observationslagrets snabbare, asynkrona `VectorLayer.getFeatures(pixel)` och kontrollerar endast det översta objektet. Högst cirka 30 kontroller startas per sekund och endast en kontroll körs åt gången. Musrörelser som kommer under väntetiden samlas till den senaste positionen. Kontrollen pausas under panorering och zoomanimering och gör inga API-anrop. Sena svar ignoreras efter exempelvis ny musposition, nytt kartresultat, kartförflyttning eller avstängd hovring. Hovringens träffkontroll är mindre exakt och har ingen extra fyrpixelsmarginal. Klick behåller den exakta träffkontrollen med fyra pixels tolerans och befintlig hantering av överlappande objekt.
+
 Under **Visning → Punktstorlek** används samma antalsbaserade skala för punkter och kluster:
 
 | Läge | Storlek |
@@ -242,6 +311,12 @@ Under **Visning → Punktstorlek** används samma antalsbaserade skala för punk
 | Efter antal – fasta gränser (standard) | ≤5 fynd: 10 px; 6–50: 14 px; ≥51: 18 px. |
 
 Antalslägena använder `observationCount`. Ytor och filterområden ingår inte i automatgränserna. Visningsvalen ändrar kartan direkt utan ny sökning och påverkar inte serverns klustring. Gul klustermarkering använder den omslutande radien `cluster.radiusMetersMin`; noggrannhetscirklar och klusterradier kan visas som hjälplager.
+
+Sökfiltrets polygoner visas automatiskt utifrån `filterAreaReferences` i ett separat lager med mörkgröna streckade konturer och utan fyllnad. Egna polygoner och sökcirklar hämtas ur det ursprungliga sökfiltret. Lagrade områden hämtas via Status-webbens `/api/areas/{areaType}/{featureId}/geometry`, som vidarebefordrar geometri och HTTP-cachevalidatorer från observations-API:t. Identiska geografiska filter återanvänder lagret under zoom och panorering; efter en timme kan geometrin omvalideras av webbläsaren. Ändrade filter ersätter konturerna och avbryter inaktuella hämtningar. Konturerna påverkar inte val av observationspunkter eller antal kartobjekt. Under **Visning → Visa sökfiltrets konturer** kan lagret döljas och visas utan en ny sökning.
+
+Om kartutsnittet inte överlappar det valda området är resultatet tomt. När kartsvaret anger noll observationer töms observationstabellen utan ett extra förhandsvisningsanrop. Även direkta anrop till `ObservationsBySearchInternal` returnerar en tom sida med HTTP 200 när en giltig bbox får tom skärning med filterområdet. En felaktig bbox i begäran ger fortfarande HTTP 400. Webbens sökproxy vidarebefordrar API:ts felstatus i stället för att omvandla exempelvis 400 till 500.
+
+När karturvalet omfattar flera lokaler visas en dropdown **Lokal** ovanför observationstabellen. Väljaren tillåter endast val från listan, utan textinmatning. **Alla lokaler (N)** visar observationer för hela urvalet. Välj en lokal för att begränsa tabellsökningen på servern och framhäva lokalens befintliga kartobjekt; en klustermedlem framhäver klustret. Kartan panoreras eller zoomas inte av lokalvalet. Samtliga `locations.ids` går att välja, även när klustret innehåller fler lokaler än detaljgränsen `MaxLocationItems`. Namn visas tillsammans med id där namn finns i `locations.items`; annars visas enbart id. Rensning återgår till alla lokaler. Ett nytt karturval eller ändrat sökfilter återställer valet; panorering och zoomning med samma sökfilter behåller det. Tabellen visar fortfarande högst fem observationer, och inaktuella svar från tidigare lokalval ignoreras.
 
 ![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
 

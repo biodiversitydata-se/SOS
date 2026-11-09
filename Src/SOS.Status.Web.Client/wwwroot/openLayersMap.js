@@ -461,7 +461,7 @@ function isPolygonLocationType(locationType) {
     return locationType.toLowerCase() === "polygon" || Number(locationType) === 2;
 }
 
-function createGeodesicCircleCoordinates(longitude, latitude, radiusMeters, projection) {
+export function createGeodesicCircleCoordinates(longitude, latitude, radiusMeters, projection) {
     const segmentCount = 96;
     const earthRadiusMeters = 6378137;
     const angularDistance = radiusMeters / earthRadiusMeters;

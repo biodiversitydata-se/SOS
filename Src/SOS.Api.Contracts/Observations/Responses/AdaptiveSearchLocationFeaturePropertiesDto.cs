@@ -117,10 +117,10 @@ public sealed class AdaptiveSearchFeatureLocationsDto
     /// <summary>All non-empty original location ids, distinct and sorted without regard to case. Never truncated.</summary>
     public List<string> Ids { get; init; } = new();
 
-    /// <summary>Maximum number of location details included in a feature.</summary>
-    public const int MaxLocationItems = 5;
+    /// <summary>Maximum number of location details included per feature. Defaults to 5; change this constant and rebuild the API to test larger responses.</summary>
+    public const int MaxLocationItems = 100;
 
-    /// <summary>At most five original locations, in the same id order as Ids. Ids and Count describe all members.</summary>
+    /// <summary>Up to <see cref="MaxLocationItems"/> original locations, in the same id order as Ids. Ids and Count describe all members.</summary>
     public List<AdaptiveSearchLocationDetailsDto> Items { get; init; } = new();
 
 }

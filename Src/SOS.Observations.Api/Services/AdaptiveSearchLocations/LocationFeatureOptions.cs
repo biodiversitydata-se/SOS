@@ -16,12 +16,12 @@ internal sealed record LocationFeatureOptions
     public int MinLocationCountBeforeClustering { get; init; }
     public Dictionary<string, Geometry>? PolygonGeometries { get; init; }
     public CreatePolygonsMode CreatePolygons { get; init; }
-    public double ProximityClusterRadiusPx { get; init; }
-    public bool ShouldCluster => ClusterPixels || ProximityClusterRadiusPx > 0 || ClusterRadiusMeters.HasValue;
+    public double DetailClusterRadiusPx { get; init; }
+    public bool ShouldCluster => ClusterPixels || DetailClusterRadiusPx > 0 || ClusterRadiusMeters.HasValue;
 
     public LocationClusteringOptions Clustering => new()
     {
         BoundingBox = BoundingBox, ClusterRadiusMeters = ClusterRadiusMeters, ClusterPixels = ClusterPixels,
-        MetersPerPixel = MetersPerPixel, ClusterRadiusPx = ClusterRadiusPx, ProximityClusterRadiusPx = ProximityClusterRadiusPx
+        MetersPerPixel = MetersPerPixel, ClusterRadiusPx = ClusterRadiusPx, DetailClusterRadiusPx = DetailClusterRadiusPx
     };
 }

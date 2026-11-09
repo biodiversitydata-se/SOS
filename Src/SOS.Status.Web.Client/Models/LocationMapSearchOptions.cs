@@ -25,8 +25,8 @@ public sealed record LocationMapSearchOptions
     public bool UseCache { get; init; } = true;
     public int? CutoffYear { get; init; } = null;
     public bool IncludeFilterAreasInResult { get; init; } = false;
-    public double DisablePixelClusteringAtMetersPerPixel { get; init; } = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel;
-    public double ProximityClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx;
+    public double SwitchToDetailClusteringAtMetersPerPixel { get; init; } = AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel;
+    public double DetailClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx;
 
     public string ToQueryString()
     {
@@ -51,8 +51,8 @@ public sealed record LocationMapSearchOptions
             ("useCache", UseCache),
             ("cutoffYear", CutoffYear),
             ("includeFilterAreasInResult", IncludeFilterAreasInResult),
-            ("disablePixelClusteringAtMetersPerPixel", DisablePixelClusteringAtMetersPerPixel),
-            ("proximityClusterRadiusPx", ProximityClusterRadiusPx),
+            ("switchToDetailClusteringAtMetersPerPixel", SwitchToDetailClusteringAtMetersPerPixel),
+            ("detailClusterRadiusPx", DetailClusterRadiusPx),
         };
         return string.Join("&", values.Where(v => v.Value is not null && v.Value is not string { Length: 0 })
             .Select(v => $"{v.Name}={Uri.EscapeDataString(v.Value is bool flag ? (flag ? "true" : "false") : Convert.ToString(v.Value, CultureInfo.InvariantCulture)!)}"));

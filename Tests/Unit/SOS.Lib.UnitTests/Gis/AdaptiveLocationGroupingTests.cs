@@ -29,11 +29,15 @@ public class AdaptiveLocationGroupingTests
         b.CreateFallbackLocationId().Should().Be(b.DistinctLocationId + "_a200");
     }
 
+    public static IEnumerable<object[]> DetailCounts() => new[]
+    {
+        1, 5, 6, 100,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 1
+    }.Distinct().Select(count => new object[] { count });
+
     [Theory]
-    [InlineData(1)]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(100)]
+    [MemberData(nameof(DetailCounts))]
     public void ItemsAreLimitedButCountsAndIdsIncludeEveryOriginalLocation(int count)
     {
         var observations = Enumerable.Range(0, count).Select(i => At($"site-{i:D3}", 0, i + 1)).Reverse().ToList();
@@ -44,8 +48,8 @@ public class AdaptiveLocationGroupingTests
         dto.HasMultipleLocations.Should().Be(count > 1);
         dto.ObservationCount.Should().Be(count);
         dto.Locations.Ids.Should().HaveCount(count).And.BeInAscendingOrder();
-        dto.Locations.Items.Should().HaveCount(Math.Min(5, count));
-        dto.Locations.Items.Select(l => l.LocationId).Should().Equal(dto.Locations.Ids.Take(5));
+        dto.Locations.Items.Should().HaveCount(Math.Min(AdaptiveSearchFeatureLocationsDto.MaxLocationItems, count));
+        dto.Locations.Items.Select(l => l.LocationId).Should().Equal(dto.Locations.Ids.Take(AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
         dto.Locations.Items[0].Locality.Should().Be("Name site-000");
         dto.Locations.Items[0].CoordinateUncertaintyInMeters.Should().Be(1);
         var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions(JsonSerializerDefaults.Web)
@@ -155,17 +159,74 @@ public class AdaptiveLocationGroupingTests
         result.Should().HaveCount(2).And.OnlyContain(f => !f.IsCluster);
     }
 
-    [Fact]
-    public void PixelRadiusStillIncreasesWhenResultExceedsTargetCount()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PixelRadiusRemainsFixedWhenResultExceedsTargetCount(bool useTwoStageOverload)
+    {
+        var observations = new List<Observation> { At("a", 0), At("b", 10), At("c", 1000), At("d", 1010) };
+        var clusterer = new Sweref99TmFastGreedyLocationClusterer(0, 1);
+
+        var result = useTwoStageOverload
+            ? clusterer.ClusterLocations(observations, Box, 1, 40, null, true)
+            : clusterer.ClusterLocations(observations, Box, 1, 40);
+
+        result.Should().HaveCount(2).And.OnlyContain(f => f.IsCluster && f.ClusterRadiusMeters == 40);
+        result.SelectMany(f => f.Observations).Should().BeEquivalentTo(observations);
+    }
+
+    [Theory]
+    [InlineData(1, 500)]
+    [InlineData(0.1, 1000)]
+    public void PixelOverloadKeepsFixedRadiusAndCanSeparateMoreThan400Groups(double resolution, int expectedCount)
+    {
+        var observations = MakeSeparatedPairs();
+        var result = new Sweref99TmFastGreedyLocationClusterer(0, 400)
+            .ClusterLocations(observations, Box, resolution, 20);
+
+        result.Should().HaveCount(expectedCount);
+        result.Should().OnlyContain(f => !f.IsCluster || f.ClusterRadiusMeters == resolution * 20);
+        result.Count(f => f.IsCluster).Should().Be(resolution == 1 ? 500 : 0);
+        result.SelectMany(f => f.Observations).Select(o => o.Occurrence.OccurrenceId)
+            .OrderBy(id => id, StringComparer.Ordinal).Should().Equal(observations.Select(o => o.Occurrence.OccurrenceId)
+                .OrderBy(id => id, StringComparer.Ordinal));
+    }
+
+    [Theory]
+    [InlineData(1, 500)]
+    [InlineData(0.1, 1000)]
+    public void ClusterGroupsKeepsFixedRadiusAndAllMembersAbove400Groups(double resolution, int expectedCount)
+    {
+        var locations = MakeSeparatedPairs().Select(o => o.Location).ToList();
+        var result = new Sweref99TmFastGreedyLocationClusterer(0, 400).ClusterGroups(locations,
+            new LocationClusteringOptions { BoundingBox = Box, MetersPerPixel = resolution, ClusterRadiusPx = 20, ClusterPixels = true });
+
+        result.Should().HaveCount(expectedCount);
+        result.Should().OnlyContain(g => !g.IsCluster || g.RadiusMeters == resolution * 20);
+        result.Count(g => g.IsCluster).Should().Be(resolution == 1 ? 500 : 0);
+        result.SelectMany(g => g.DistinctLocationIds).Should().BeEquivalentTo(locations.Select(l => l.DistinctLocationId));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void WithoutPixelResolutionRadiusStillGrowsToReachTarget(bool useTwoStageOverload)
     {
         var observations = new List<Observation> { At("a", 0), At("b", 1000), At("c", 2000) };
+        var clusterer = new Sweref99TmFastGreedyLocationClusterer(0, 1);
+        var box = LatLonBoundingBoxDto.Create(15, 59.0001, 15.0001, 59);
 
-        var result = new Sweref99TmFastGreedyLocationClusterer(0, 1)
-            .ClusterLocations(observations, Box, 1, 40, null, true).Single();
+        var result = useTwoStageOverload
+            ? clusterer.ClusterLocations(observations, box, null, 40, null, true)
+            : clusterer.ClusterLocations(observations, box);
 
-        result.ClusterRadiusMeters.Should().BeGreaterThan(40);
-        result.Observations.Should().BeEquivalentTo(observations);
+        var cluster = result.Should().ContainSingle().Subject;
+        cluster.ClusterRadiusMeters.Should().BeGreaterThan(40);
+        cluster.Observations.Should().BeEquivalentTo(observations);
     }
+
+    private static List<Observation> MakeSeparatedPairs() => Enumerable.Range(0, 1000)
+        .Select(i => At($"pair-{i:D4}", i / 2 * 100 + i % 2 * 10)).ToList();
 
     [Fact]
     public void PixelThresholdCountsMeterUnitsAndCentroidWeightsUnderlyingGroups()

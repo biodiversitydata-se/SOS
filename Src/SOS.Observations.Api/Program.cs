@@ -1,4 +1,4 @@
-using SOS.Shared.Api.Extensions;
+﻿using SOS.Shared.Api.Extensions;
 ﻿using Hangfire;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -143,6 +143,9 @@ static void ConfigureServices(
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin()
+                .WithExposedHeaders(
+                    "ETag",                    
+                    "X-Observations-TotalCount")
             );
         });
     }

@@ -2,6 +2,10 @@ using SOS.Status.Web.Client.Models;
 ﻿﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Status.Web.Services;
+using SOS.Api.Client.Abstractions;
+using SOS.Api.Client.Exceptions;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Areas;
 
 namespace SOS.Status.Web.Endpoints;
 
@@ -11,6 +15,32 @@ public static class ObservationSearchEndpoints
     {
         public IEndpointRouteBuilder MapObservationSearchEndpoints()
         {
+            app.MapGet("/api/areas/{areaType}/{featureId}/geometry",
+                async ([FromServices] ISosAreasClient areas, HttpContext context,
+                    AreaTypeDto areaType, string featureId) =>
+                {
+                    if (!Enum.IsDefined(areaType) || string.IsNullOrWhiteSpace(featureId))
+                        return Results.BadRequest("A valid areaType and featureId are required.");
+                    try
+                    {
+                        var result = await areas.GetAreaGeometryAsync(areaType, featureId,
+                            context.Request.Headers.IfNoneMatch.ToString(), context.RequestAborted);
+                        context.Response.Headers.CacheControl = AreaGeometryCacheDefaults.CacheControl;
+                        if (result.ETag != null) context.Response.Headers.ETag = result.ETag;
+                        return result.NotModified
+                            ? Results.StatusCode(StatusCodes.Status304NotModified)
+                            : Results.Text(result.GeoJson, "application/geo+json; charset=utf-8");
+                    }
+                    catch (SosApiException exception)
+                    {
+                        return Results.StatusCode((int)exception.StatusCode);
+                    }
+                    catch (FormatException)
+                    {
+                        return Results.BadRequest("Invalid If-None-Match header.");
+                    }
+                });
+
             app.MapPost("/api/observations/search",
                 async ([FromServices] ObservationSearchService service,
                        [FromBody] SearchFilterInternalDto filter,
@@ -35,6 +65,10 @@ public static class ObservationSearchEndpoints
                             sensitiveObservations);
                         
                         return Results.Ok(result);
+                    }
+                    catch (SosApiException ex)
+                    {
+                        return Results.Problem(statusCode: (int)ex.StatusCode, detail: ex.ResponseBody ?? ex.Message);
                     }
                     catch (ArgumentException ex)
                     {
@@ -94,8 +128,8 @@ public static class ObservationSearchEndpoints
                        [FromQuery] bool useCache = true,
                        [FromQuery] int? cutoffYear = null,
                        [FromQuery] bool includeFilterAreasInResult = false,
-                       [FromQuery] double disablePixelClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel,
-                       [FromQuery] double proximityClusterRadiusPx = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx) =>
+                       [FromQuery] double switchToDetailClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel,
+                       [FromQuery] double detailClusterRadiusPx = AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx) =>
                 {
                     try
                     {
@@ -121,8 +155,8 @@ public static class ObservationSearchEndpoints
                                 UseCache = useCache,
                                 CutoffYear = cutoffYear,
                                 IncludeFilterAreasInResult = includeFilterAreasInResult,
-                                DisablePixelClusteringAtMetersPerPixel = disablePixelClusteringAtMetersPerPixel,
-                                ProximityClusterRadiusPx = proximityClusterRadiusPx,
+                                SwitchToDetailClusteringAtMetersPerPixel = switchToDetailClusteringAtMetersPerPixel,
+                                DetailClusterRadiusPx = detailClusterRadiusPx,
                             }, httpContext.RequestAborted);
 
                         if (result.ObservationsTotalCount.HasValue)

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
@@ -35,9 +35,11 @@ public class AdaptiveSearchLocationsClusteringTests
             });
         var task = fixture.Service.SearchAsync(new AdaptiveSearchLocationsRequest
         {
-            Filter = new() { ProtectionFilter = ProtectionFilterDto.Public }, CancellationToken = cts.Token,
+            Filter = new() { ProtectionFilter = ProtectionFilterDto.Public },
+            CancellationToken = cts.Token,
             AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-            ObservationsLimit = 1000, InputBbox = Bbox, Bbox = Bbox
+            ObservationsLimit = 1000,
+            InputBbox = Bbox
         });
         cts.Cancel();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
@@ -60,8 +62,8 @@ public class AdaptiveSearchLocationsClusteringTests
     public void RequestClusteringDefaults_MatchSharedDefaults()
     {
         var request = new AdaptiveSearchLocationsRequest { Filter = new() };
-        request.DisablePixelClusteringAtMetersPerPixel.Should().Be(AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel);
-        request.ProximityClusterRadiusPx.Should().Be(AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx);
+        request.SwitchToDetailClusteringAtMetersPerPixel.Should().Be(AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel);
+        request.DetailClusterRadiusPx.Should().Be(AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx);
         request.ClusterRadiusPx.Should().Be(AdaptiveSearchLocationsDefaults.ClusterRadiusPx);
         request.MinimumLocationCountBeforeClustering.Should().Be(AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering);
     }
@@ -87,9 +89,9 @@ public class AdaptiveSearchLocationsClusteringTests
     public static IEnumerable<object[]> SearchCases()
     {
         foreach (var strategy in new[] { AdaptiveSearchLocationsStrategy.ObservationsThenGrid, AdaptiveSearchLocationsStrategy.Auto })
-        foreach (var (resolution, cutoff, clustered) in new (double?, double, bool)[]
-                 { (1, 2, false), (2, 2, false), (2.01, 2, true), (1, 0, true), (3, 4, false), (null, 2, true) })
-            yield return [strategy, resolution, cutoff, clustered];
+            foreach (var (resolution, cutoff, clustered) in new (double?, double, bool)[]
+                     { (1, 2, false), (2, 2, false), (2.01, 2, true), (1, 0, true), (3, 4, false), (null, 2, true) })
+                yield return [strategy, resolution, cutoff, clustered];
     }
 
     [Theory]
@@ -178,6 +180,43 @@ public class AdaptiveSearchLocationsClusteringTests
     }
 
     [Theory]
+    [InlineData(AdaptiveSearchLocationsStrategy.ObservationsThenGrid)]
+    [InlineData(AdaptiveSearchLocationsStrategy.ObservationsThenLocationsThenGrid)]
+    [InlineData(AdaptiveSearchLocationsStrategy.LocationsThenGrid)]
+    [InlineData(AdaptiveSearchLocationsStrategy.Auto)]
+    public async Task FixedPixelRadius_AllowsMoreThan400ItemsAndReevaluatesZoomAcrossStrategiesAndCache(
+        AdaptiveSearchLocationsStrategy strategy)
+    {
+        var fixture = new Fixture(count: 900, spacing: 0.002, pairOffset: 0.00002);
+        var representative = strategy is AdaptiveSearchLocationsStrategy.Auto or AdaptiveSearchLocationsStrategy.LocationsThenGrid;
+        var cases = new (double Resolution, int Count)[] { (3, 450), (0.01, 900), (3, 450) };
+
+        for (var index = 0; index < cases.Length; index++)
+        {
+            var item = cases[index];
+            var result = await fixture.Service.SearchAsync(Request(item.Resolution, cutoff: 0, strategy: strategy, clusterRadiusPx: 20));
+
+            result.ResultType.Should().Be("locations");
+            result.LocationFeatures.Should().HaveCount(item.Count);
+            result.FeatureCount.Should().Be(item.Count);
+            result.LocationFeatures.Count(f => f.IsCluster).Should().Be(item.Count == 450 ? 450 : 0);
+            result.LocationFeatures.Should().OnlyContain(f => !f.IsCluster ||
+                (f.GroupingType == LocationGroupingType.PixelCluster && f.ClusterRadiusMeters == item.Resolution * 20));
+            result.LocationFeatures.Sum(f => f.ObservationCount).Should().Be(900);
+            result.LocationFeatures.SelectMany(f => LocationFeatureResponseMapper.ToProperties(f).Locations.Ids)
+                .Should().BeEquivalentTo(Enumerable.Range(0, 900).Select(i => $"site-{i}"));
+            result.LocationsBeforeClustering.Should().Be(900);
+            result.LocationAggregationMode.Should().Be(representative ? "representative" : null);
+            result.CacheStatus.Should().Be(representative ? "BYPASS" : index == 0 ? "MISS" : "HIT");
+        }
+
+        fixture.Manager.Verify(manager => manager.GetChunkAsync(It.IsAny<PreparedObservationFilter>(), 0, 1000,
+            It.IsAny<SearchExecutionOptions>()), representative ? Times.Never() : Times.Once());
+        fixture.Manager.Verify(manager => manager.GetGeogridTileAggregationAsync(It.IsAny<PreparedObservationFilter>(),
+            It.IsAny<int>()), Times.Never());
+    }
+
+    [Theory]
     [InlineData(2, false)]
     [InlineData(0, true)]
     public async Task SampleObservations_UseTheSamePixelClusteringCutoff(double cutoff, bool clustered)
@@ -212,28 +251,28 @@ public class AdaptiveSearchLocationsClusteringTests
     [InlineData(true, 1d, 2d)]
     [InlineData(true, null, 0d)]
     [InlineData(false, 1d, 0d)]
-    public void ProximityGrouping_RequiresPixelSwitchAndResolution(bool cluster, double? resolution, double radius)
+    public void DetailClustering_RequiresPixelSwitchAndResolution(bool cluster, double? resolution, double radius)
     {
-        AdaptiveSearchLocationsClusteringPolicy.GetProximityClusterRadiusPx(Request(resolution, cluster: cluster, proximity: 2))
+        AdaptiveSearchLocationsClusteringPolicy.GetDetailClusterRadiusPx(Request(resolution, cluster: cluster, detailRadiusPx: 2))
             .Should().Be(radius);
     }
 
-    public static IEnumerable<object[]> ProximitySearchCases()
+    public static IEnumerable<object[]> DetailClusteringSearchCases()
     {
         foreach (var strategy in new[] { AdaptiveSearchLocationsStrategy.ObservationsThenGrid, AdaptiveSearchLocationsStrategy.Auto })
-        foreach (var (resolution, minimum, radius) in new[] { (1d, 0, 2d), (3d, 3, 6d), (3d, 4, 6d), (3d, 2, 1500d) })
-            yield return [strategy, resolution, minimum, radius];
+            foreach (var (resolution, minimum, radius) in new[] { (1d, 0, 2d), (3d, 3, 6d), (3d, 4, 6d), (3d, 2, 1500d) })
+                yield return [strategy, resolution, minimum, radius];
     }
 
     [Theory]
-    [MemberData(nameof(ProximitySearchCases))]
-    public async Task ProximityGrouping_PreservesMetadataAndSummariesAcrossStrategiesAndCacheHits(
+    [MemberData(nameof(DetailClusteringSearchCases))]
+    public async Task DetailClustering_PreservesMetadataAndSummariesAcrossStrategiesAndCacheHits(
         AdaptiveSearchLocationsStrategy strategy, double resolution, int minimum, double radius)
     {
         var fixture = new Fixture(spacing: 0.00002, observationsPerLocation: 2);
         for (var index = 0; index < 2; index++)
         {
-            var result = await fixture.Service.SearchAsync(Request(resolution, strategy: strategy, minimumCount: minimum, proximity: 2));
+            var result = await fixture.Service.SearchAsync(Request(resolution, strategy: strategy, minimumCount: minimum, detailRadiusPx: 2));
             var feature = result.LocationFeatures.Should().ContainSingle().Subject;
             feature.GroupingType.Should().Be(LocationGroupingType.PixelCluster);
             var properties = LocationFeatureResponseMapper.ToProperties(feature);
@@ -250,10 +289,10 @@ public class AdaptiveSearchLocationsClusteringTests
     }
 
     [Fact]
-    public async Task CachedProximityGrouping_ReevaluatesZoomRadiusAndMasterSwitch()
+    public async Task CachedDetailClustering_ReevaluatesZoomRadiusAndMasterSwitch()
     {
         var fixture = new Fixture(spacing: 0.00002);
-        var cases = new (double Resolution, double Proximity, bool Cluster, int Count)[]
+        var cases = new (double Resolution, double DetailRadiusPx, bool Cluster, int Count)[]
         {
             (1, 2, true, 1), (0.1, 2, true, 3), (1, 0, true, 3),
             (1, 2, false, 3), (1, 2, true, 1)
@@ -261,7 +300,7 @@ public class AdaptiveSearchLocationsClusteringTests
         for (var index = 0; index < cases.Length; index++)
         {
             var item = cases[index];
-            var result = await fixture.Service.SearchAsync(Request(item.Resolution, cluster: item.Cluster, proximity: item.Proximity));
+            var result = await fixture.Service.SearchAsync(Request(item.Resolution, cluster: item.Cluster, detailRadiusPx: item.DetailRadiusPx));
             result.LocationFeatures.Should().HaveCount(item.Count);
             result.CacheStatus.Should().Be(index == 0 ? "MISS" : "HIT");
         }
@@ -269,9 +308,9 @@ public class AdaptiveSearchLocationsClusteringTests
     }
 
     [Fact]
-    public async Task ProximityGrouping_WithSamplesUsesRawObservationPath()
+    public async Task DetailClustering_WithSamplesUsesRawObservationPath()
     {
-        var result = await new Fixture().Service.SearchAsync(Request(2, samples: true, proximity: 500));
+        var result = await new Fixture().Service.SearchAsync(Request(2, samples: true, detailRadiusPx: 500));
         var feature = result.LocationFeatures.Should().ContainSingle().Subject;
         feature.GroupingType.Should().Be(LocationGroupingType.PixelCluster);
         feature.ClusterRadiusMeters.Should().Be(1000);
@@ -280,31 +319,40 @@ public class AdaptiveSearchLocationsClusteringTests
     }
 
     [Fact]
-    public async Task ProximityGrouping_WithoutResolutionDoesNotBypassCountThreshold()
+    public async Task DetailClustering_WithoutResolutionDoesNotBypassCountThreshold()
     {
-        var result = await new Fixture(spacing: 0.00002).Service.SearchAsync(Request(null, minimumCount: 3, proximity: 2));
+        var result = await new Fixture(spacing: 0.00002).Service.SearchAsync(Request(null, minimumCount: 3, detailRadiusPx: 2));
         result.LocationFeatures.Should().HaveCount(3).And.OnlyContain(feature => !feature.IsCluster);
     }
 
     private static AdaptiveSearchLocationsRequest Request(double? resolution, double cutoff = 2, bool cluster = true,
         double? meterRadius = null, AdaptiveSearchLocationsStrategy strategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-        int minimumCount = 0, bool samples = false, double proximity = 0) => new()
-    {
-        Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
-        AdaptiveSearchStrategy = strategy, ObservationsLimit = 1000, MaxGridCells = 100, MaxZoom = 21,
-        InputBbox = Bbox, Bbox = Bbox, Cluster = cluster, ClusterRadiusMeters = meterRadius,
-        MetersPerPixel = resolution, DisablePixelClusteringAtMetersPerPixel = cutoff, ClusterRadiusPx = 500,
-        ProximityClusterRadiusPx = proximity,
-        MinLocationsPerCluster = 2, MinimumLocationCountBeforeClustering = minimumCount,
-        UseCache = true, CreateSampleObservations = samples
-    };
+        int minimumCount = 0, bool samples = false, double detailRadiusPx = 0, double clusterRadiusPx = 500) => new()
+        {
+            Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
+            AdaptiveSearchStrategy = strategy,
+            ObservationsLimit = 1000,
+            MaxGridCells = 100,
+            MaxZoom = 21,
+            InputBbox = Bbox,
+            Cluster = cluster,
+            ClusterRadiusMeters = meterRadius,
+            MetersPerPixel = resolution,
+            SwitchToDetailClusteringAtMetersPerPixel = cutoff,
+            ClusterRadiusPx = clusterRadiusPx,
+            DetailClusterRadiusPx = detailRadiusPx,
+            MinLocationsPerCluster = 2,
+            MinimumLocationCountBeforeClustering = minimumCount,
+            UseCache = true,
+            CreateSampleObservations = samples
+        };
 
     private sealed class Fixture
     {
         public Mock<IObservationManager> Manager { get; } = new(MockBehavior.Strict);
         public AdaptiveSearchLocationsService Service { get; }
 
-        public Fixture(int count = 3, bool coincident = false, double spacing = 0.0001, int observationsPerLocation = 1)
+        public Fixture(int count = 3, bool coincident = false, double spacing = 0.0001, int observationsPerLocation = 1, double? pairOffset = null)
         {
             var records = Enumerable.Range(0, count * observationsPerLocation).Select(index =>
             {
@@ -313,8 +361,11 @@ public class AdaptiveSearchLocationsClusteringTests
                 {
                     ["location"] = new JsonObject
                     {
-                        ["locationId"] = $"site-{locationIndex}", ["type"] = 0,
-                        ["decimalLongitude"] = 15 + (coincident && locationIndex == 1 ? 0 : locationIndex) * spacing,
+                        ["locationId"] = $"site-{locationIndex}",
+                        ["type"] = 0,
+                        ["decimalLongitude"] = pairOffset.HasValue
+                            ? 15 + locationIndex / 2 * spacing + locationIndex % 2 * pairOffset.Value
+                            : 15 + (coincident && locationIndex == 1 ? 0 : locationIndex) * spacing,
                         ["decimalLatitude"] = 59d
                     },
                     ["occurrence"] = new JsonObject { ["isPositiveObservation"] = true },
@@ -344,14 +395,14 @@ public class AdaptiveSearchLocationsClusteringTests
 
     private sealed class MemoryCache : IAdaptiveSearchLocationsCache
     {
-        private List<CachedLocationAggregate>? _locations;
+        private List<LocationAggregate>? _locations;
         public string CreateCacheKey(int? roleId, string? application, bool sensitive, SearchFilterInternalDto filter) => "locations";
-        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<LocationAggregate> locations, bool requireExactBoundingBox = false)
         {
             locations = _locations ?? [];
             return _locations != null;
         }
-        public void Set(string key, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations) => _locations = locations;
-        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => Bbox;
+        public void Set(string key, LatLonBoundingBoxDto? bbox, List<LocationAggregate> locations) => _locations = locations;
+        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<LocationAggregate> locations) => Bbox;
     }
 }

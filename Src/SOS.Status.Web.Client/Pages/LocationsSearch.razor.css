@@ -1,11 +1,33 @@
+.map-hover-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-sizing: border-box;
+    max-width: min(280px, calc(100% - 16px));
+    max-height: calc(100% - 16px);
+    overflow: hidden;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+}
+
 .selected-feature-hit-list {
     margin: 10px 0 0;
     padding-left: 22px;
 }
 
-.selected-feature-hit-list li {
-    margin-bottom: 8px;
-}
+    .selected-feature-hit-list li {
+        margin-bottom: 8px;
+    }
 
 .selected-feature-list-text {
     margin-top: 2px;
@@ -69,4 +91,36 @@
     border: 1px solid black;
     border-radius: 50%;
     background: #bdbdbd;
+}
+
+.map-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-legend-symbol {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-style: solid;
+}
+
+.map-legend-symbol--point {
+    border-width: 1px;
+    border-radius: 50%;
+}
+
+.map-legend-symbol--diffused {
+    border-width: 2px;
+}
+
+.map-legend-symbol--grid {
+    border-width: 1px;
+}
+
+.map-legend-symbol--filter-area {
+    width: 22px;
+    border: 2px dashed #00695c;
 }

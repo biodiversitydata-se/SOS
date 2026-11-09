@@ -108,6 +108,7 @@ public static class DependencyInjectionExtensions
             // Add Caches
             services.AddSingleton<SearchTotalCountCache>();
             services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddScoped<IAreaGeometryService, AreaGeometryService>();
             services.AddFusionCache(ProcessedLocationRepository.LocationGeometryCacheName)
                 .WithCacheKeyPrefixByCacheName()
                 .WithMemoryCache(new MemoryCache(new MemoryCacheOptions
@@ -129,7 +130,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICache<int, Taxon>, TaxonCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType,TaxonTree<IBasicTaxon>>>>();
+            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var taxonSumAggregationCache = new ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(48) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
@@ -203,8 +204,8 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IAdaptiveSearchByLocationMapper, AdaptiveSearchByLocationMapper>();
             services.AddScoped<IAdaptiveSearchLocationsService, AdaptiveSearchLocationsService>();
             services.AddScoped<IAdaptiveSearchLocationsCache, AdaptiveSearchLocationsCache>();
-            services.AddScoped<IAdaptiveSearchLocationAggregator, AdaptiveSearchLocationAggregator>();
-            services.AddScoped<IAdaptiveSearchLocationFeatureFactory, AdaptiveSearchLocationFeatureFactory>();
+            services.AddSingleton<IAdaptiveSearchLocationAggregator, AdaptiveSearchLocationAggregator>();
+            services.AddSingleton<IAdaptiveSearchLocationFeatureFactory, AdaptiveSearchLocationFeatureFactory>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();

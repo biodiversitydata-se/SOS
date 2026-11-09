@@ -82,6 +82,10 @@ The same service is available as `sos.ObservationSearch`. Prefer direct injectio
 
 The observation client includes both public and internal observation-by-id methods. Adaptive search returns the response body together with the SOS result headers; deserialize JSON bodies to `AdaptiveSearchResultDto<Observation>` when `OutputFormatDto.Json` is selected. `ISosLookupService.GetAreaWithGeometryAsync` handles the zipped area export and caches the geometry.
 
+`AdaptiveSearchLocationsInternal` includes a top-level `filterAreaReferences` array in its GeoJSON body even when `IncludeFilterAreasInResult` is false. Stored area references expose `AreaType`, `FeatureId` and a geometry URL relative to the API origin. One `FilterArea.OwnGeometries` reference covers the entire original `geographics.geometries` list; no coordinates are duplicated. A `FilterArea.Polygon` reference represents the first request point with its `MaxDistanceFromPoint`, matching the inline search-circle behavior. Read this array from `response.GeoJson` using `FilterAreaReferenceDto`.
+
+`ISosAreasClient.GetAreaGeometryAsync(areaType, featureId, ifNoneMatch, cancellationToken)` calls the cacheable GeoJSON geometry endpoint without downloading a ZIP file. Keep the returned `GeoJson` and `ETag`. On a later conditional request, `NotModified == true` means that the server returned HTTP 304 and the previously cached body should be reused. The client passes validators through; it does not retain geometry bodies automatically.
+
 ## Selected role
 
 An optional `ISosRoleIdProvider` supplies the selected role for each outgoing request:

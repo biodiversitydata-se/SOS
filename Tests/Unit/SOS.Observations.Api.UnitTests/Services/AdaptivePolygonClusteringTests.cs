@@ -147,9 +147,10 @@ public class AdaptivePolygonClusteringTests
     [InlineData(true, CreatePolygonsMode.WhenNeeded)]
     public void CoincidentPolygonsUseTheirWholeUnionBeforeClustering(bool rawRecords, CreatePolygonsMode mode)
     {
-        var records = Enumerable.Range(0, 7).Select(i => Record($"polygon-{i}", 0, true))
+        var locationCount = AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2;
+        var records = Enumerable.Range(0, locationCount).Select(i => Record($"polygon-{i}", 0, true))
             .Append(Record("a", 2)).Append(Record("b", 4)).ToArray();
-        var polygons = Enumerable.Range(0, 7).ToDictionary(i => $"polygon-{i}", i => Rectangle(i * 2, 2, 12));
+        var polygons = Enumerable.Range(0, locationCount).ToDictionary(i => $"polygon-{i}", i => Rectangle(i * 2, 2, 12));
 
         var result = Cluster(records, polygons, mode, rawRecords);
 
@@ -157,9 +158,9 @@ public class AdaptivePolygonClusteringTests
         var polygonFeature = result.Single(feature => !feature.IsCluster);
         var dto = LocationFeatureResponseMapper.ToProperties(polygonFeature);
         dto.GroupingType.Should().Be(LocationGroupingType.CoLocatedLocations);
-        dto.Locations.Ids.Should().HaveCount(7);
-        dto.Locations.Items.Should().HaveCount(5);
-        polygonFeature.ObservationCount.Should().Be(7);
+        dto.Locations.Ids.Should().HaveCount(locationCount);
+        dto.Locations.Items.Should().HaveCount(AdaptiveSearchFeatureLocationsDto.MaxLocationItems);
+        polygonFeature.ObservationCount.Should().Be(locationCount);
         var expectedUnion = NetTopologySuite.Operation.Union.UnaryUnionOp.Union(polygons.Values.ToList());
         polygonFeature.Geometry!.EqualsTopologically(expectedUnion).Should().BeTrue();
     }
@@ -259,8 +260,8 @@ public class AdaptivePolygonClusteringTests
         var size = large ? 30 : 2;
         var polygons = new Dictionary<string, Geometry> { ["polygon"] = Rectangle(0, size, size) };
         var result = rawRecords
-            ? factory.CreateItems(records, new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, ProximityClusterRadiusPx = 2 })
-            : factory.CreateItems(aggregator.CreateAggregates(records), new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, ProximityClusterRadiusPx = 2 });
+            ? factory.CreateItems(records, new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, DetailClusterRadiusPx = 2 })
+            : factory.CreateItems(aggregator.CreateAggregates(records), new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, DetailClusterRadiusPx = 2 });
 
         result.Should().HaveCount(large ? 2 : 1);
         result.Sum(feature => feature.ObservationCount).Should().Be(3);

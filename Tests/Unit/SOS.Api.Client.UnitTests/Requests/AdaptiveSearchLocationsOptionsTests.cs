@@ -17,9 +17,9 @@ public class AdaptiveSearchLocationsOptionsTests
         try
         {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("sv-SE");
-            var options = new AdaptiveSearchLocationsOptions { DisablePixelClusteringAtMetersPerPixel = cutoff, ProximityClusterRadiusPx = cutoff };
-            options.ToQueryString().Split('&').Should().Contain($"disablePixelClusteringAtMetersPerPixel={expected}");
-            options.ToQueryString().Split('&').Should().Contain($"proximityClusterRadiusPx={expected}");
+            var options = new AdaptiveSearchLocationsOptions { SwitchToDetailClusteringAtMetersPerPixel = cutoff, DetailClusterRadiusPx = cutoff };
+            options.ToQueryString().Split('&').Should().Contain($"switchToDetailClusteringAtMetersPerPixel={expected}");
+            options.ToQueryString().Split('&').Should().Contain($"detailClusterRadiusPx={expected}");
         }
         finally
         {
@@ -31,14 +31,14 @@ public class AdaptiveSearchLocationsOptionsTests
     public void ClusteringDefaults_MatchMapSettingsAndAreSerialized()
     {
         var options = new AdaptiveSearchLocationsOptions();
-        options.DisablePixelClusteringAtMetersPerPixel.Should().Be(2.0);
+        options.SwitchToDetailClusteringAtMetersPerPixel.Should().Be(2.0);
         options.ClusterRadiusPx.Should().Be(20.0);
-        options.ProximityClusterRadiusPx.Should().Be(10.0);
+        options.DetailClusterRadiusPx.Should().Be(10.0);
         options.MinLocationCountBeforeClustering.Should().Be(0);
         var query = options.ToQueryString().Split('&');
-        query.Should().Contain(FormattableString.Invariant($"disablePixelClusteringAtMetersPerPixel={options.DisablePixelClusteringAtMetersPerPixel}"));
+        query.Should().Contain(FormattableString.Invariant($"switchToDetailClusteringAtMetersPerPixel={options.SwitchToDetailClusteringAtMetersPerPixel}"));
         query.Should().Contain(FormattableString.Invariant($"clusterRadiusPx={options.ClusterRadiusPx}"));
-        query.Should().Contain(FormattableString.Invariant($"proximityClusterRadiusPx={options.ProximityClusterRadiusPx}"));
+        query.Should().Contain(FormattableString.Invariant($"detailClusterRadiusPx={options.DetailClusterRadiusPx}"));
         query.Should().Contain(FormattableString.Invariant($"minLocationCountBeforeClustering={options.MinLocationCountBeforeClustering}"));
     }
 }

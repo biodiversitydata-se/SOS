@@ -12,6 +12,7 @@
         <MudItem xs="12" lg="6">
             <div style="position: relative;">
                 <div @ref="_mapContainer" style="height:560px; width:100%;"></div>
+                <div @ref="_mapTooltip" class="map-hover-tooltip" role="tooltip" hidden></div>
 
                 @if (isLoading)
                 {
@@ -102,6 +103,23 @@
         <MudItem xs="12" lg="6">
             <MudExpansionPanels MultiExpansion="false" Class="mb-2">
                 <MudExpansionPanel Text="@ObservationPanelTitle" Expanded="true">
+                    @if (selectedLocationIds.Count > 1)
+                    {
+                        <MudSelect T="ObservationLocationOption"
+                                   Label="Lokal"
+                                   Value="@selectedObservationLocation"
+                                   ValueChanged="OnObservationLocationChangedAsync"
+                                   ToStringFunc="@(option => option?.Label ?? string.Empty)"
+                                   Placeholder="@AllObservationLocationsLabel"
+                                   Clearable="true"
+                                   Dense="true"
+                                   Class="mb-2">
+                            @foreach (var option in observationLocationOptions)
+                            {
+                                <MudSelectItem T="ObservationLocationOption" Value="@option">@option.Label</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
                     <div class="observation-preview-loading" role="status" aria-live="polite">
                         @if (isObservationPreviewLoading)
                         {
@@ -127,7 +145,8 @@
                         @if (string.Equals(lastResultType, "geogrid", StringComparison.OrdinalIgnoreCase))
                         {
                             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-2">
-                                Kartresultatet är aggregerat till geogrid. Zooma in och sök igen för att kunna markera en lokal.
+                                Kartresultatet är aggregerat till geogrid. Klicka på en gridruta för att zooma in.
+                                Om automatisk sökning är avstängd, tryck på Sök efteråt för att kunna markera en lokal.
                             </MudAlert>
                         }
 
@@ -181,7 +200,7 @@
                         </MudStack>
                         <MudText Typo="Typo.body2"><strong>Zoom:</strong> @currentZoomLevel.ToString("F2")</MudText>
                         <MudText Typo="Typo.body2"><strong>Meter per pixel:</strong> @currentMetersPerPixelText</MudText>
-                        <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>                        
+                        <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>
                         <MudText Typo="Typo.body2"><strong>Resultat:</strong> @lastResultTypeText</MudText>
                         <MudText Typo="Typo.body2"><strong>Använd strategi:</strong> @lastAdaptiveSearchStrategyText</MudText>
                         <MudText Typo="Typo.body2"><strong>Cache:</strong> @lastCacheStatusText</MudText>
@@ -298,7 +317,8 @@
 
                         <MudNumericField T="double"
                                          @bind-Value="clusterRadiusPx"
-                                         Label="Radie för vanlig pixelklustring (px)"
+                                         Label="Fast sökradie för vanlig pixelklustring (px)"
+                                         HelperText="Radien ökas inte för att minska antalet kartobjekt. Klustrets utbredning kan vara större."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -319,9 +339,9 @@
                                          FullWidth="true" />
 
                         <MudNumericField T="double"
-                                         @bind-Value="disablePixelClusteringAtMetersPerPixel"
-                                         Label="Stäng av vanlig pixelklustring vid ≤ (m/px)"
-                                         HelperText="0 = ingen automatisk avstängning. Fast meterklustring påverkas inte."
+                                         @bind-Value="switchToDetailClusteringAtMetersPerPixel"
+                                         Label="Växla till detaljklustring vid ≤ (m/px)"
+                                         HelperText="0 = ingen zoomväxling. Fast meterklustring påverkas inte."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -332,7 +352,7 @@
                         <MudNumericField T="int"
                                          @bind-Value="minLocationCountBeforeClustering"
                                          Label="Min kartobjekt innan pixelklustring"
-                                         HelperText="Gäller vanlig pixelklustring. Mycket nära punkter kan fortfarande grupperas."
+                                         HelperText="Gäller vanlig pixelklustring. Vid eller under antalsgränsen används detaljklustring."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -342,9 +362,9 @@
                                          FullWidth="true" />
 
                         <MudNumericField T="double"
-                                         @bind-Value="proximityClusterRadiusPx"
-                                         Label="Gruppera mycket nära punkter (px)"
-                                         HelperText="Används när vanlig pixelklustring stoppas av zoom- eller antalsgränsen. 0 = av."
+                                         @bind-Value="detailClusterRadiusPx"
+                                         Label="Fast sökradie för detaljklustring (px)"
+                                         HelperText="Används när vanlig pixelklustring stoppas av zoom- eller antalsgränsen. 0 = detaljklustring av."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -406,10 +426,38 @@
                             </div>
                         }
 
+                        <MudSelect T="HoverFeedbackMode"
+                                   Value="@hoverFeedbackMode"
+                                   ValueChanged="OnHoverFeedbackModeChanged"
+                                   Label="Hovring"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true"
+                                   HelperText="Punkter visar noggrannhetsradie och kluster sin utbredning med röd kant och svagt gul fyllnad. Minsta ytan motsvarar punktsymbolen.">
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.Cursor">Visa annan muspekare när man hovrar över</MudSelectItem>
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.Outline">Samma muspekare men tillfällig röd kontur</MudSelectItem>
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.None">Inget</MudSelectItem>
+                        </MudSelect>
+
+                        <MudCheckBox T="bool"
+                                     Value="@showMapTooltip"
+                                     ValueChanged="OnShowMapTooltipChanged"
+                                     Label="Visa tooltip vid hovring"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
                         <MudCheckBox T="bool"
                                      Value="@showCoordinateUncertaintyCircles"
                                      ValueChanged="OnShowCoordinateUncertaintyCirclesChanged"
-                                     Label="Visa noggrannhetscirklar för visade lokaler (högst 5 per punkt)"
+                                     Label="Visa noggrannhetscirklar för visade lokaler"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
+                        <MudCheckBox T="bool"
+                                     Value="@showFilterAreaOutlines"
+                                     ValueChanged="OnShowFilterAreaOutlinesChanged"
+                                     Label="Visa sökfiltrets konturer"
                                      Color="Color.Primary"
                                      Dense="true" />
 
@@ -456,89 +504,30 @@
 
                 <MudExpansionPanel Text="Teckenförklaring">
                     <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle2">Punktlokaler och polygonlokaler</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: yellow; border: 1px solid rgba(0,0,0,0.55); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Present</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #d7191c; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #f97316; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Treated</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #8a8a8a; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotRecovered</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: black; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotPresent</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #ff69b4; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; border-radius: 50%; background: dodgerblue; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Cluster</MudText>
-                            </div>
-                        </MudStack>
-
-                        <MudDivider />
-
-                        <MudText Typo="Typo.subtitle2">Diffuserade lokaler</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,0,0,0.20); border: 2px solid rgba(180,0,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Present</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(120,0,0,0.34); border: 2px solid rgba(95,0,0,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(249,115,22,0.32); border: 2px solid rgba(194,65,12,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Treated</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(128,128,128,0.30); border: 2px solid rgba(92,92,92,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotRecovered</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(0,0,0,0.30); border: 2px solid rgba(0,0,0,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">NotPresent</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,105,180,0.30); border: 2px solid rgba(214,51,132,0.90); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
-                            </div>
-                        </MudStack>
-
-                        <MudDivider />
-
-                        <MudText Typo="Typo.subtitle2">Gridrutor</MudText>
-                        <MudStack Spacing="1">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,213,128,0.60); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Få observationer</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(255,145,0,0.66); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Medel</MudText>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="width: 14px; height: 14px; background: rgba(220,38,38,0.72); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
-                                <MudText Typo="Typo.body2">Många observationer</MudText>
-                            </div>
-                        </MudStack>
+                        <div class="map-legend-row">
+                            <span class="map-legend-symbol map-legend-symbol--filter-area"></span>
+                            <MudText Typo="Typo.body2">Sökfiltrets konturer</MudText>
+                        </div>
+                        @foreach (var section in MapLegendSections)
+                        {
+                            @if (section != MapLegendSections[0])
+                            {
+                                <MudDivider />
+                            }
+                            <MudText Typo="Typo.subtitle2">@section.Title</MudText>
+                            <MudStack Spacing="1">
+                                @foreach (var item in section.Items)
+                                {
+                                    <div class="map-legend-row">
+                                        <span class="map-legend-symbol @section.SymbolClass" style="background: @item.Fill; border-color: @item.Border;"></span>
+                                        <MudText Typo="Typo.body2">@item.Label</MudText>
+                                    </div>
+                                }
+                            </MudStack>
+                        }
                     </MudStack>
                 </MudExpansionPanel>
             </MudExpansionPanels>
         </MudItem>
     </MudGrid>
 </MudStack>
-
