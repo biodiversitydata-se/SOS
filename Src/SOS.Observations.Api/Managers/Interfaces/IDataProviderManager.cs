@@ -15,9 +15,9 @@ public interface IDataProviderManager
     /// <param name="includeInactive"></param>
     /// <param name="cultureCode"></param>
     /// <param name="includeProvidersWithNoObservations"></param>
-    /// <param name="categories">Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, 
-    /// Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
-    /// Fungi, Algae</param>
+    /// <param name="categories">Category/ies to match. NationalInventory, RegionalInventory, MuseumCollections, HerbariaCollections, CitizenSciencePlatform, Atlas, 
+    /// Terrestrial, Freshwater, Marine, Vertebrates, Invertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
+    /// Fungi, Algae, DataStewardship</param>
     /// <returns></returns>
     Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<SOS.Lib.Enums.DataProviderCategory> categories = null);
 
