@@ -53,9 +53,9 @@ public class DataProvidersController : ControllerBase
     /// <summary>
     /// Get all data providers.
     /// </summary>
-    /// <param name="categories">Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, 
-    /// Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
-    /// Fungi, Algae</param>
+    /// <param name="categories">Category/ies to match. NationalInventory, RegionalInventory, MuseumCollections, HerbariaCollections, CitizenSciencePlatform, Atlas, 
+    /// Terrestrial, Freshwater, Marine, Vertebrates, Invertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
+    /// Fungi, Algae, DataStewardship</param>
     /// <param name="cultureCode">Culture code.</param>
     /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
     /// <returns>List of data providers.</returns>

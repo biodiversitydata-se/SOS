@@ -473,7 +473,7 @@
           {
             "name": "categories",
             "in": "query",
-            "description": "Category/ies to match. DataHostesship, RegionalInventory, CitizenSciencePlatform, Atlas, \n            Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,\n            Fungi, Algae",
+            "description": "Category/ies to match. NationalInventory, RegionalInventory, MuseumCollections, HerbariaCollections, CitizenSciencePlatform, Atlas, \n            Terrestrial, Freshwater, Marine, Vertebrates, Invertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,\n            Fungi, Algae, DataStewardship",
             "schema": {
               "type": "array",
               "items": {
