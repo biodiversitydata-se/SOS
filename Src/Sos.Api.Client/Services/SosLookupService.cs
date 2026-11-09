@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SOS.Api.Contracts.Areas.Requests;
 using System.IO.Compression;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using SOS.Api.Client.Clients;
 using System.Runtime.CompilerServices;
 
@@ -127,9 +128,46 @@ public sealed class SosLookupService : ISosLookupService
             }
 
             using var entryStream = entry.Open();
-            return JsonSerializer.Deserialize<AreaWithGeometryDto>(entryStream, SosClientHttp.SerializerOptions);
+            return DeserializeAreaExportJson(entryStream);
         }
 
-        return JsonSerializer.Deserialize<AreaWithGeometryDto>(bytes, SosClientHttp.SerializerOptions);
+        using var jsonStream = new MemoryStream(bytes, writable: false);
+        return DeserializeAreaExportJson(jsonStream);
     }
+
+    private static AreaWithGeometryDto? DeserializeAreaExportJson(Stream stream)
+    {
+        var json = JsonNode.Parse(stream);
+        if (json is JsonObject area && area.FirstOrDefault(property =>
+                property.Key.Equals("geometry", StringComparison.OrdinalIgnoreCase)).Value is JsonObject geometry)
+        {
+            NormalizeExportGeometry(geometry);
+        }
+
+        return json?.Deserialize<AreaWithGeometryDto>(SosClientHttp.SerializerOptions);
+    }
+
+    private static void NormalizeExportGeometry(JsonObject geometry)
+    {
+        // SOS area exports use PascalCase; GeoJSON.Text expects GeoJSON member names.
+        foreach (var name in new[] { "type", "coordinates", "geometries" })
+        {
+            var property = geometry.FirstOrDefault(candidate =>
+                candidate.Key.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (property.Key is not null && property.Key != name)
+            {
+                geometry.Remove(property.Key);
+                geometry[name] = property.Value;
+            }
+        }
+
+        if (geometry["geometries"] is JsonArray children)
+        {
+            foreach (var child in children.OfType<JsonObject>())
+            {
+                NormalizeExportGeometry(child);
+            }
+        }
+    }
+
 }

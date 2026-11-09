@@ -11,6 +11,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using GeoJSON.Text.Geometry;
 using Xunit;
 
 namespace SOS.Api.Client.UnitTests.Services;
@@ -295,6 +298,79 @@ public class SosLookupServiceTests
 
         await Task.WhenAll(secondRequest, retriedRequest);
         firstAreaExports.Should().Be(2);
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task GetAreasWithGeometryAsync_ReadsExportGeometryFormats(bool pascalCase, bool zipped)
+    {
+        string[] geometries =
+        [
+            """{"type":"Polygon","coordinates":[[[18,59],[19,59],[19,60],[18,59]]]}""",
+            """{"type":"MultiPolygon","coordinates":[[[[18,59],[19,59],[19,60],[18,59]]]]}""",
+            """{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[18,59]},{"type":"GeometryCollection","geometries":[{"type":"Polygon","coordinates":[[[18,59],[19,59],[19,60],[18,59]]]}]}]}"""
+        ];
+        foreach (var expected in geometries)
+        {
+            var geometryJson = pascalCase
+                ? expected.Replace("\"type\"", "\"Type\"").Replace("\"coordinates\"", "\"Coordinates\"").Replace("\"geometries\"", "\"Geometries\"")
+                : expected;
+            var json = pascalCase ? "{\"Geometry\":" + geometryJson + "}" : "{\"geometry\":" + geometryJson + "}";
+            var bytes = zipped ? CreateZip(json) : Encoding.UTF8.GetBytes(json);
+            using var cache = new MemoryCache(new MemoryCacheOptions());
+            var service = CreateExportLookup(bytes, cache);
+
+            var result = await service.GetAreasWithGeometryAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+            result.Records.Should().ContainSingle();
+            var actual = JsonSerializer.SerializeToNode<IGeometryObject>(result.Records.Single().Geometry!);
+            JsonNode.DeepEquals(actual, JsonNode.Parse(expected)).Should().BeTrue();
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("{\"Geometry\":null}")]
+    public async Task GetAreasWithGeometryAsync_PreservesAreaWithoutGeometry(string? json)
+    {
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var service = CreateExportLookup(json is null ? null : Encoding.UTF8.GetBytes(json), cache);
+        var result = await service.GetAreasWithGeometryAsync(cancellationToken: TestContext.Current.CancellationToken);
+        result.Records.Single().Geometry.Should().BeNull();
+        result.Records.Single().Name.Should().Be("Area one");
+    }
+
+    [Fact]
+    public async Task GetAreasWithGeometryAsync_RejectsZipWithoutJson()
+    {
+        using var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            archive.CreateEntry("readme.txt");
+        }
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var service = CreateExportLookup(stream.ToArray(), cache);
+        var action = () => service.GetAreasWithGeometryAsync(cancellationToken: TestContext.Current.CancellationToken);
+        await action.Should().ThrowAsync<InvalidDataException>();
+    }
+
+    private static SosLookupService CreateExportLookup(byte[]? export, IMemoryCache cache)
+    {
+        var client = new Mock<ISosAreasClient>();
+        client.Setup(value => value.GetAreasAsync(It.IsAny<AreasOptions?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedResultDto<AreaBaseDto>
+            {
+                TotalCount = 1,
+                Records = [new AreaBaseDto { AreaType = AreaTypeDto.Province, FeatureId = "SE-1", Name = "Area one" }]
+            });
+        client.Setup(value => value.GetAreaExportAsync(AreaTypeDto.Province, "SE-1", AreaExportFormatDto.Json, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(export);
+        return new SosLookupService(client.Object, cache, Options.Create(new SosClientOptions { ObservationsApiBaseAddress = new Uri("https://example.test/") }));
     }
 
     private static byte[] CreateZip(string json)
