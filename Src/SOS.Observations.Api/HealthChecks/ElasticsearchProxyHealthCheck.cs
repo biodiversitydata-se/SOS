@@ -2,10 +2,6 @@
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks;
 
