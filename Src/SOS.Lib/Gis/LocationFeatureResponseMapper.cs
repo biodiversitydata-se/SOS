@@ -59,6 +59,10 @@ public static class LocationFeatureResponseMapper
             Presentation = new AdaptiveSearchLocationPresentationDto
             {
                 Status = (LocationPresentationStatusDto)presentationStatus,
+                Generalized = !locationFeature.IsCluster &&
+                    locationFeature.Geometry is Polygon or MultiPolygon &&
+                    (locationFeature.GeneralizedLocationIds.Count > 0 ||
+                     locationFeature.Observations.Any(observation => observation.IsGeneralized)),
                 StatusCounts = presentationStatusCount.ToDictionary(
                     entry => (LocationPresentationStatusDto)entry.Key,
                     entry => entry.Value),

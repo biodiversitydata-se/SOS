@@ -103,7 +103,8 @@ Lokalfeatures returneras i ritordning: ytor först, därefter linjer och sist pu
 | `groupingType` | `singleLocation`, `coLocatedLocations`, `meterCluster` eller `pixelCluster`. De två sista är kluster. |
 | `hasMultipleLocations` | `true` när `locations.count > 1`, även för sammanfallande lokaler. |
 | `observationCount` | Totalt antal matchande observationer, även när representanter används. |
-| `presentation` | Kartstatus, statusräknare, brytårsstatus och känslighetsinformation. |
+| `presentation` | Kartstatus, generaliseringsinformation, statusräknare, brytårsstatus och känslighetsinformation. |
+| `presentation.generalized` | Styr polygonens färg: `true` använder generaliseringsfärgen. Värdet är `true` endast för lokaler som returneras som `Polygon` eller `MultiPolygon` och har minst en generaliserad ingående lokal. För punkter och kluster är värdet alltid `false`, även om deras lokaler är generaliserade. Beräkningen använder samtliga lokalers metadata, oberoende av begränsningen av `locations.items`. Fältet kommer direkt efter `status`. Geometritypen läses från GeoJSONs `geometry.type`. |
 | `observationSummary` | Antal taxa och delräknare för observationer. |
 | `locations` | Fullständiga `count` och `ids`; `items` begränsas av `AdaptiveSearchFeatureLocationsDto.MaxLocationItems` (standard 100 lokaler per feature), sorterade efter id. |
 | `cluster.radiusMeters` | Använd sökradie i meter. |
@@ -183,6 +184,7 @@ Flaggorna följer dessa fält, inte JSON-objektens indelning. Följande förkort
       "isPresentationStatusApproximated": false,
       "presentation": {
         "status": "Present",
+        "generalized": false,
         "statusCounts": { "Present": 1 },
         "isAllObservationsSensitive": false
       },

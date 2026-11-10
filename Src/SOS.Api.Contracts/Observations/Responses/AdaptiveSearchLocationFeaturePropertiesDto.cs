@@ -34,7 +34,7 @@ public sealed class AdaptiveSearchLocationFeaturePropertiesDto
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public AdaptiveSearchLocationClusterDetailsDto? Cluster { get; init; }
 
-    /// <summary>Map status and status counts. The two approximation flags cover different fields.</summary>
+    /// <summary>Map status, generalization information and status counts. The two approximation flags cover different fields.</summary>
     public AdaptiveSearchLocationPresentationDto Presentation { get; init; } = new();
 
     /// <summary>
@@ -64,6 +64,15 @@ public sealed class AdaptiveSearchLocationPresentationDto
 {
     /// <summary>The overall presentation status for this feature. Covered by IsPresentationStatusApproximated.</summary>
     public LocationPresentationStatusDto Status { get; init; }
+
+    /// <summary>
+    /// Whether to use the generalized polygon colors when rendering a polygon feature.
+    /// True only for non-cluster Polygon or MultiPolygon features with at least one generalized location.
+    /// False for points and clusters, even when their member locations are generalized.
+    /// Computed from all represented location metadata, independently of the Locations.Items limit.
+    /// Does not describe the returned geometry type; use the GeoJSON geometry.type for that.
+    /// </summary>
+    public bool Generalized { get; init; }
 
     /// <summary>
     /// Counts per presentation status. With representatives, these may not add up to ObservationCount.

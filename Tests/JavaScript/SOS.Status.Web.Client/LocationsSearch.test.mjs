@@ -10,10 +10,10 @@ function load() {
     vm.runInContext(source + '\nglobalThis.api = { getFeatureLocationIds, toFeatureClickPayload, setHighlightedLocationIds, isDiffusedLocation, getPointStyle, getObservationStyle, configureCompactClusterRendering, attachLayersForTest(layers) { map = { getAllLayers: () => layers, getSize: () => null, getView: () => null }; } };', context);
     return context.api;
 }
-function feature(id, locations, groupingType = 'coLocatedLocations', summary = {}, cluster) {
+function feature(id, locations, groupingType = 'coLocatedLocations', summary = {}, cluster, presentation) {
     const result = {
         getId: () => id,
-        get: key => ({ locations, groupingType, observationSummary: summary, cluster })[key],
+        get: key => ({ locations, groupingType, observationSummary: summary, cluster, presentation })[key],
         getGeometry: () => ({ getType: () => 'Point' }),
         setStyle: style => { result.style = style; },
         changed: () => {}
@@ -34,6 +34,49 @@ test('click carries map identity while searchable ids contain every original mem
 test('generalized members outside the five items still affect geometry presentation', () => {
     const api = load();
     assert.equal(api.isDiffusedLocation(feature('point', { items: [{ isGeneralized: false }] }, 'coLocatedLocations', { statusCounts: { diffusedCount: 1 } })), true);
+});
+
+test('presentation generalization takes precedence over legacy summary and location details', () => {
+    const api = load();
+    const make = (generalized, legacyGeneralized) => feature('polygon',
+        { items: [{ isGeneralized: legacyGeneralized }] }, 'coLocatedLocations',
+        { statusCounts: { diffusedCount: legacyGeneralized ? 1 : 0 } }, undefined,
+        { generalized });
+    assert.equal(api.isDiffusedLocation(make(true, false)), true);
+    assert.equal(api.isDiffusedLocation(make(false, true)), false);
+});
+
+test('presentation generalization changes polygon color while preserving point and cluster styles', () => {
+    const api = load();
+    for (const geometryType of ['Polygon', 'MultiPolygon', 'Point']) {
+        const make = generalized => {
+            const f = feature('site', {}, 'singleLocation', {}, undefined, { generalized });
+            f.getGeometry = () => ({ getType: () => geometryType });
+            return f;
+        };
+        const normal = api.getObservationStyle(make(false), {});
+        const generalized = api.getObservationStyle(make(true), {});
+        if (geometryType === 'Point') assert.equal(generalized, normal);
+        else {
+            assert.notEqual(generalized.fill.color, normal.fill.color);
+            assert.notEqual(generalized.stroke.color, normal.stroke.color);
+        }
+    }
+    for (const grouping of ['meterCluster', 'pixelCluster']) {
+        const make = generalized => feature('cluster', {}, grouping, {}, undefined, { generalized });
+        assert.equal(api.getPointStyle(make(true)), api.getPointStyle(make(false)));
+    }
+});
+
+test('points and clusters with generalized members use presentation.generalized false', () => {
+    const api = load();
+    for (const groupingType of ['singleLocation', 'meterCluster', 'pixelCluster']) {
+        const f = feature('point', { items: [{ isGeneralized: true }] }, groupingType,
+            { statusCounts: { diffusedCount: 1 } }, undefined, { generalized: false });
+        assert.equal(api.isDiffusedLocation(f), false);
+        const ordinary = feature('ordinary', {}, groupingType, {}, undefined, { generalized: false });
+        assert.equal(api.getObservationStyle(f, {}), api.getObservationStyle(ordinary, {}));
+    }
 });
 
 for (const [groupingType, compactColor, defaultColor, defaultRadius] of [

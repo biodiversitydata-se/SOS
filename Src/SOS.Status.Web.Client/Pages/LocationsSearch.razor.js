@@ -1505,6 +1505,13 @@ function getNumericPropertyOrNull(feature, ...propertyNames) {
 }
 
 function isDiffusedLocation(feature) {
+    const presentation = getFeatureProperty(feature, "presentation", "Presentation");
+    const generalized = getObjectProperty(presentation, "generalized", "Generalized");
+    if (generalized !== null && generalized !== undefined) {
+        return toBoolean(generalized);
+    }
+
+    // Compatibility with responses from API versions without presentation.generalized.
     const renderMode = feature.get("renderMode");
     if (typeof renderMode === "string" && renderMode.toLowerCase() === "diffused") {
         return true;
