@@ -73,6 +73,7 @@ public class SosObservationsClientEndpointTests
             request.RequestUri.Query.Should().Contain("outputFieldSet=All");
             request.RequestUri.Query.Should().Contain("translationCultureCode=en-GB");
             request.RequestUri.Query.Should().Contain("resolveGeneralizedObservations=true");
+            request.RequestUri.Query.Should().Contain("protectionFilter=BothPublicAndSensitive");
             request.Headers.Accept.Select(header => header.MediaType).Should().Contain("application/json");
             return new HttpResponseMessage(HttpStatusCode.NoContent);
         });
@@ -84,11 +85,21 @@ public class SosObservationsClientEndpointTests
             {
                 OutputFieldSet = OutputFieldSet.All,
                 TranslationCultureCode = "en-GB",
+                ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
                 ResolveGeneralizedObservations = true
             },
             TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public void ObservationByIdInternalOptions_OmitsProtectionFilterWhenNotSet()
+    {
+        var options = new ObservationByIdInternalOptions { SensitiveObservations = true };
+
+        options.ToQueryString().Should().Contain("sensitiveObservations=true")
+            .And.NotContain("protectionFilter=");
     }
 
     private static HttpClient CreateHttpClient(HttpMessageHandler handler)

@@ -17,6 +17,9 @@ public sealed class ObservationByIdInternalOptions : SosRoleRequestOptions
     /// <summary>Controls the use of the sensitive-observation index.</summary>
     public bool SensitiveObservations { get; set; }
 
+    /// <summary>Filters observations by protection status; overrides SensitiveObservations when set.</summary>
+    public ProtectionFilterDto? ProtectionFilter { get; set; }
+
     /// <summary>Controls resolution of generalized observations when the caller is authorized.</summary>
     public bool ResolveGeneralizedObservations { get; set; }
 
@@ -27,6 +30,7 @@ public sealed class ObservationByIdInternalOptions : SosRoleRequestOptions
             .AddEnum("outputFieldSet", OutputFieldSet)
             .Add("translationCultureCode", TranslationCultureCode)
             .Add("sensitiveObservations", SensitiveObservations)
+            .AddEnum("protectionFilter", ProtectionFilter)
             .Add("resolveGeneralizedObservations", ResolveGeneralizedObservations)
             .Add("occurrenceId", string.IsNullOrWhiteSpace(OccurrenceId) ? null : OccurrenceId)
             .ToString();

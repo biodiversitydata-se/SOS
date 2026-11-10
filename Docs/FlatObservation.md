@@ -206,6 +206,9 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | PublicCollection | PublicCollection | Publik samling | Public collection | String | AllWithValues |
 | SpeciesCollectionLabel | SpeciesCollectionLabel | SpeciesCollectionLabel | SpeciesCollectionLabel | String | AllWithValues |
 | Type | Type | Typ | Type | String | AllWithValues |
+| SensitivityReason | Occurrence.SensitivityReason | Skäl till skydd | Sensitive reason | Int32 | AllWithValues |
+| InvasiveSpeciesTreatment | Occurrence.InvasiveSpeciesTreatment | Invasiva arter åtgärd | Invasive species treatment | String | AllWithValues |
+| InvasiveSpeciesTreatmentId | Occurrence.InvasiveSpeciesTreatment.Id | Invasiva arter åtgärd id | Invasive species treatment ID | Int32 | AllWithValues |
 
 ## All
 All fields in the Minimum, Extended and AllWithValues field sets, and also the following fields:
