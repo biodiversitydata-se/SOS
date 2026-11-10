@@ -58,14 +58,12 @@ public static class LocationFeatureResponseMapper
             ObservationCount = locationFeature.ObservationCount,
             Presentation = new AdaptiveSearchLocationPresentationDto
             {
-                Status = (LocationPresentationStatusDto)presentationStatus,
+                Status = presentationStatus,
                 Generalized = !locationFeature.IsCluster &&
                     locationFeature.Geometry is Polygon or MultiPolygon &&
                     (locationFeature.GeneralizedLocationIds.Count > 0 ||
                      locationFeature.Observations.Any(observation => observation.IsGeneralized)),
-                StatusCounts = presentationStatusCount.ToDictionary(
-                    entry => (LocationPresentationStatusDto)entry.Key,
-                    entry => entry.Value),
+                StatusCounts = presentationStatusCount,
                 CutoffYearStatus = (CutoffYearStatusDto?)cutoffYearStatus,
                 IsAllObservationsSensitive = isAllObservationsSensitive
             },
@@ -127,7 +125,7 @@ public static class LocationFeatureResponseMapper
         return hasLocations ? Math.Round(maxRadiusMeters, 3) : null;
     }
 
-    private static Dictionary<LocationPresentationStatus, int> CalculatePresentationStatusCount(
+    private static Dictionary<LocationPresentationStatusDto, int> CalculatePresentationStatusCount(
         LocationObservationSummary observationSummary,
         int? cutoffYear)
     {
@@ -135,11 +133,11 @@ public static class LocationFeatureResponseMapper
         {
             var fallbackStatus = CalculateLocationPresentationStatus(false, observationSummary, cutoffYear, observationSummary.IsAllObservationsSensitive);
             return observationSummary.ObservationCount > 0
-                ? new Dictionary<LocationPresentationStatus, int> { [fallbackStatus] = observationSummary.ObservationCount }
-                : new Dictionary<LocationPresentationStatus, int>();
+                ? new Dictionary<LocationPresentationStatusDto, int> { [fallbackStatus] = observationSummary.ObservationCount }
+                : new Dictionary<LocationPresentationStatusDto, int>();
         }
 
-        var presentationStatusCount = new Dictionary<LocationPresentationStatus, int>();
+        var presentationStatusCount = new Dictionary<LocationPresentationStatusDto, int>();
         foreach (var summary in observationSummary.PresentationStatusSummaries)
         {
             AddPresentationStatusCount(
@@ -151,11 +149,11 @@ public static class LocationFeatureResponseMapper
         return SortPresentationStatusCount(presentationStatusCount);
     }
 
-    private static Dictionary<LocationPresentationStatus, int> CalculatePresentationStatusCount(
+    private static Dictionary<LocationPresentationStatusDto, int> CalculatePresentationStatusCount(
         IReadOnlyCollection<SOS.Lib.Models.Processed.Observation.Observation> observations,
         int? cutoffYear)
     {
-        var presentationStatusCount = new Dictionary<LocationPresentationStatus, int>();
+        var presentationStatusCount = new Dictionary<LocationPresentationStatusDto, int>();
         foreach (var observation in observations)
         {
             AddPresentationStatusCount(
@@ -168,8 +166,8 @@ public static class LocationFeatureResponseMapper
     }
 
     private static void AddPresentationStatusCount(
-        Dictionary<LocationPresentationStatus, int> presentationStatusCount,
-        LocationPresentationStatus presentationStatus,
+        Dictionary<LocationPresentationStatusDto, int> presentationStatusCount,
+        LocationPresentationStatusDto presentationStatus,
         int count)
     {
         if (count <= 0)
@@ -182,10 +180,10 @@ public static class LocationFeatureResponseMapper
             : count;
     }
 
-    private static Dictionary<LocationPresentationStatus, int> SortPresentationStatusCount(
-        IReadOnlyDictionary<LocationPresentationStatus, int> presentationStatusCount)
+    private static Dictionary<LocationPresentationStatusDto, int> SortPresentationStatusCount(
+        IReadOnlyDictionary<LocationPresentationStatusDto, int> presentationStatusCount)
     {
-        var sortedPresentationStatusCount = new Dictionary<LocationPresentationStatus, int>();
+        var sortedPresentationStatusCount = new Dictionary<LocationPresentationStatusDto, int>();
         foreach (var item in presentationStatusCount
             .Where(item => item.Value > 0)
             .OrderBy(item => (int)item.Key))
@@ -196,7 +194,7 @@ public static class LocationFeatureResponseMapper
         return sortedPresentationStatusCount;
     }
 
-    private static LocationPresentationStatus CalculateObservationPresentationStatus(
+    private static LocationPresentationStatusDto CalculateObservationPresentationStatus(
         LocationObservationSummary.PresentationStatusSummary summary,
         int? cutoffYear)
     {
@@ -205,38 +203,38 @@ public static class LocationFeatureResponseMapper
             if (summary.IsPresent && summary.EndYear.HasValue && summary.EndYear.Value >= cutoffYear.Value)
             {
                 return summary.IsSensitive
-                    ? LocationPresentationStatus.PresentSensitive
-                    : LocationPresentationStatus.Present;
+                    ? LocationPresentationStatusDto.PresentSensitive
+                    : LocationPresentationStatusDto.Present;
             }
 
             if (summary.IsPresent && summary.EndYear.HasValue && summary.EndYear.Value < cutoffYear.Value)
             {
-                return LocationPresentationStatus.DividedByYearUntil;
+                return LocationPresentationStatusDto.DividedByYearUntil;
             }
 
             return summary.IsTreated
-                ? LocationPresentationStatus.Treated
-                : LocationPresentationStatus.NotPresent;
+                ? LocationPresentationStatusDto.Treated
+                : LocationPresentationStatusDto.NotPresent;
         }
 
         if (summary.IsPresent)
         {
             return summary.IsSensitive
-                ? LocationPresentationStatus.PresentSensitive
-                : LocationPresentationStatus.Present;
+                ? LocationPresentationStatusDto.PresentSensitive
+                : LocationPresentationStatusDto.Present;
         }
 
         if (summary.IsTreated)
         {
-            return LocationPresentationStatus.Treated;
+            return LocationPresentationStatusDto.Treated;
         }
 
         return summary.IsNotRecovered
-            ? LocationPresentationStatus.NotRecovered
-            : LocationPresentationStatus.NotPresent;
+            ? LocationPresentationStatusDto.NotRecovered
+            : LocationPresentationStatusDto.NotPresent;
     }
 
-    private static LocationPresentationStatus CalculateObservationPresentationStatus(
+    private static LocationPresentationStatusDto CalculateObservationPresentationStatus(
         SOS.Lib.Models.Processed.Observation.Observation observation,
         int? cutoffYear)
     {
@@ -247,40 +245,40 @@ public static class LocationFeatureResponseMapper
                 endYear >= cutoffYear.Value)
             {
                 return observation.Sensitive
-                    ? LocationPresentationStatus.PresentSensitive
-                    : LocationPresentationStatus.Present;
+                    ? LocationPresentationStatusDto.PresentSensitive
+                    : LocationPresentationStatusDto.Present;
             }
 
             if (IsPresentObservation(observation) &&
                 GetObservationEndYear(observation) is int untilYear &&
                 untilYear < cutoffYear.Value)
             {
-                return LocationPresentationStatus.DividedByYearUntil;
+                return LocationPresentationStatusDto.DividedByYearUntil;
             }
 
             return IsTreatedObservation(observation)
-                ? LocationPresentationStatus.Treated
-                : LocationPresentationStatus.NotPresent;
+                ? LocationPresentationStatusDto.Treated
+                : LocationPresentationStatusDto.NotPresent;
         }
 
         if (IsPresentObservation(observation))
         {
             return observation.Sensitive
-                ? LocationPresentationStatus.PresentSensitive
-                : LocationPresentationStatus.Present;
+                ? LocationPresentationStatusDto.PresentSensitive
+                : LocationPresentationStatusDto.Present;
         }
 
         if (IsTreatedObservation(observation))
         {
-            return LocationPresentationStatus.Treated;
+            return LocationPresentationStatusDto.Treated;
         }
 
         return IsNotRecoveredObservation(observation)
-            ? LocationPresentationStatus.NotRecovered
-            : LocationPresentationStatus.NotPresent;
+            ? LocationPresentationStatusDto.NotRecovered
+            : LocationPresentationStatusDto.NotPresent;
     }
 
-    private static LocationPresentationStatus CalculateLocationPresentationStatus(
+    private static LocationPresentationStatusDto CalculateLocationPresentationStatus(
         bool isCluster,
         LocationObservationSummary observationSummary,
         int? cutoffYear,
@@ -288,7 +286,7 @@ public static class LocationFeatureResponseMapper
     {
         if (isCluster)
         {
-            return LocationPresentationStatus.Cluster;
+            return LocationPresentationStatusDto.Cluster;
         }
 
         if (cutoffYear.HasValue)
@@ -296,45 +294,45 @@ public static class LocationFeatureResponseMapper
             if (IsOnOrAfterCutoff(observationSummary.MaxPresentEndYear, cutoffYear.Value))
             {
                 return observationSummary.AllObservationsArePresent && isAllObservationsSensitive
-                    ? LocationPresentationStatus.PresentSensitive
-                    : LocationPresentationStatus.Present;
+                    ? LocationPresentationStatusDto.PresentSensitive
+                    : LocationPresentationStatusDto.Present;
             }
 
             return IsBeforeCutoff(observationSummary.MinPresentEndYear, cutoffYear.Value)
-                ? LocationPresentationStatus.DividedByYearUntil
+                ? LocationPresentationStatusDto.DividedByYearUntil
                 : observationSummary.TreatedCount > 0
-                    ? LocationPresentationStatus.Treated
-                    : LocationPresentationStatus.NotPresent;
+                    ? LocationPresentationStatusDto.Treated
+                    : LocationPresentationStatusDto.NotPresent;
         }
 
         if (observationSummary.FoundCount > 0)
         {
             return observationSummary.AllObservationsArePresent && isAllObservationsSensitive
-                ? LocationPresentationStatus.PresentSensitive
-                : LocationPresentationStatus.Present;
+                ? LocationPresentationStatusDto.PresentSensitive
+                : LocationPresentationStatusDto.Present;
         }
 
         if (observationSummary.TreatedCount > 0)
         {
-            return LocationPresentationStatus.Treated;
+            return LocationPresentationStatusDto.Treated;
         }
 
         if (observationSummary.NotRecoveredCount > 0)
         {
-            return LocationPresentationStatus.NotRecovered;
+            return LocationPresentationStatusDto.NotRecovered;
         }
 
-        return LocationPresentationStatus.NotPresent;
+        return LocationPresentationStatusDto.NotPresent;
     }
 
-    private static LocationPresentationStatus CalculateLocationPresentationStatus(
+    private static LocationPresentationStatusDto CalculateLocationPresentationStatus(
         LocationFeature locationFeature,
         int? cutoffYear,
         bool isAllObservationsSensitive)
     {
         if (locationFeature.IsCluster)
         {
-            return LocationPresentationStatus.Cluster;
+            return LocationPresentationStatusDto.Cluster;
         }
 
         var observations = locationFeature.Observations;
@@ -345,16 +343,16 @@ public static class LocationFeatureResponseMapper
             {
                 var allObservationsArePresent = observations.Count > 0 && observations.All(IsPresentObservation);
                 return allObservationsArePresent && isAllObservationsSensitive
-                    ? LocationPresentationStatus.PresentSensitive
-                    : LocationPresentationStatus.Present;
+                    ? LocationPresentationStatusDto.PresentSensitive
+                    : LocationPresentationStatusDto.Present;
             }
 
             return observations.Any(observation => IsPresentObservation(observation) &&
                                                    IsObservationBeforeCutoffYear(observation, cutoffYear.Value))
-                ? LocationPresentationStatus.DividedByYearUntil
+                ? LocationPresentationStatusDto.DividedByYearUntil
                 : observations.Any(IsTreatedObservation)
-                    ? LocationPresentationStatus.Treated
-                    : LocationPresentationStatus.NotPresent;
+                    ? LocationPresentationStatusDto.Treated
+                    : LocationPresentationStatusDto.NotPresent;
         }
 
         var hasPresentObservation = observations.Any(IsPresentObservation);
@@ -362,21 +360,21 @@ public static class LocationFeatureResponseMapper
         {
             var allObservationsArePresent = observations.Count > 0 && observations.All(IsPresentObservation);
             return allObservationsArePresent && isAllObservationsSensitive
-                ? LocationPresentationStatus.PresentSensitive
-                : LocationPresentationStatus.Present;
+                ? LocationPresentationStatusDto.PresentSensitive
+                : LocationPresentationStatusDto.Present;
         }
 
         if (observations.Any(IsTreatedObservation))
         {
-            return LocationPresentationStatus.Treated;
+            return LocationPresentationStatusDto.Treated;
         }
 
         if (observations.Any(IsNotRecoveredObservation))
         {
-            return LocationPresentationStatus.NotRecovered;
+            return LocationPresentationStatusDto.NotRecovered;
         }
 
-        return LocationPresentationStatus.NotPresent;
+        return LocationPresentationStatusDto.NotPresent;
     }
 
     private static CutoffYearStatus CalculateCutoffYearStatus(IReadOnlyCollection<SOS.Lib.Models.Processed.Observation.Observation> observations, int cutoffYear)
