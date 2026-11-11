@@ -53,6 +53,11 @@ public class ApiUsageStatisticsRow
     public long SumResponseCount { get; set; }
 
     /// <summary>
+    /// Sorted, unique taxon list identifiers used in the request filter, separated by commas.
+    /// </summary>
+    public string? TaxonListIds { get; set; }
+
+    /// <summary>
     /// User making the request
     /// </summary>
     public string UserId { get; set; }

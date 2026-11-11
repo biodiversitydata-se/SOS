@@ -24,6 +24,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Attributes;
 using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Services.AdaptiveSearch;
@@ -51,6 +52,7 @@ namespace SOS.Observations.Api.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
+[LogTaxonListIds]
 public class ObservationsController : ControllerBase
 {
     internal const string AdaptiveSearchLocationsCacheName = "adaptive-search-locations";

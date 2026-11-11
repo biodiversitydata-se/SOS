@@ -29,6 +29,11 @@ public class ObservationApiConfiguration
     public bool EnableResponseCompression { get; set; } = false;
 
     /// <summary>
+    /// If true, log taxon list identifiers from search and export filters to Application Insights.
+    /// </summary>
+    public bool EnableTaxonListLogging { get; set; } = false;
+
+    /// <summary>
     /// File Export path
     /// </summary>
     public string ExportPath { get; set; }

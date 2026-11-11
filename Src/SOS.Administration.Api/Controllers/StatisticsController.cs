@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
@@ -21,6 +22,7 @@ namespace SOS.Administration.Api.Controllers;
 public class StatisticsController : ControllerBase
 {
     private readonly IApiUsageStatisticsManager _apiUsageStatisticsManager;
+    private readonly IBackgroundJobClient? _backgroundJobClient;
     private readonly ILogger<StatisticsController> _logger;
 
     /// <summary>
@@ -30,8 +32,18 @@ public class StatisticsController : ControllerBase
     /// <param name="logger"></param>
     public StatisticsController(
         IApiUsageStatisticsManager apiUsageStatisticsManager,
-        ILogger<StatisticsController> logger)
+        ILogger<StatisticsController> logger) : this(apiUsageStatisticsManager, logger, null)
     {
+    }
+
+    /// <summary>Creates a controller with the configured background job client.</summary>
+    [ActivatorUtilitiesConstructor]
+    public StatisticsController(
+        IApiUsageStatisticsManager apiUsageStatisticsManager,
+        ILogger<StatisticsController> logger,
+        IBackgroundJobClient? backgroundJobClient = null)
+    {
+        _backgroundJobClient = backgroundJobClient;
         _apiUsageStatisticsManager = apiUsageStatisticsManager ?? throw new ArgumentNullException(nameof(apiUsageStatisticsManager));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -86,17 +98,34 @@ public class StatisticsController : ControllerBase
     /// <summary>
     /// Create Excel file with API usage statistics.
     /// </summary>
+    /// <param name="createdBy">Report creator.</param>
+    /// <param name="includeTaxonListUsage">Include a separate sheet with daily usage per taxon list.</param>
+    /// <param name="fromDate">First date to include (YYYY-MM-DD). Omit for an open start.</param>
+    /// <param name="toDate">Last date to include (YYYY-MM-DD). Omit for an open end.</param>
     /// <returns></returns>
     [HttpPost("CreateExcelFileReport/Run")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public IActionResult RunCreateApiStatisticsExcelFileJob([FromQuery] string createdBy)
+    public IActionResult RunCreateApiStatisticsExcelFileJob([FromQuery] string createdBy,
+        [FromQuery] bool includeTaxonListUsage = false,
+        [FromQuery] DateTime? fromDate = null,
+        [FromQuery] DateTime? toDate = null)
     {
         try
         {
+            fromDate = fromDate.HasValue ? DateTime.SpecifyKind(fromDate.Value.Date, DateTimeKind.Unspecified) : null;
+            toDate = toDate.HasValue ? DateTime.SpecifyKind(toDate.Value.Date, DateTimeKind.Unspecified) : null;
+            if (fromDate > toDate)
+            {
+                return BadRequest("From date must be less than or equal to toDate.");
+            }
+
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var reportId = Report.CreateReportId();
-            BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunCreateExcelFileReportAsync(reportId, createdBy));
+            var jobClient = _backgroundJobClient ?? new BackgroundJobClient();
+            jobClient.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunCreateExcelFileReportAsync(
+                reportId, createdBy, includeTaxonListUsage, fromDate, toDate));
             return new OkObjectResult($"Create API usage statistics Excel report job with Id \"{reportId}\" was enqueued to Hangfire.");
         }
         catch (Exception e)
@@ -105,6 +134,11 @@ public class StatisticsController : ControllerBase
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
+
+    /// <summary>Creates the default report for existing in-process callers.</summary>
+    [NonAction]
+    public IActionResult RunCreateApiStatisticsExcelFileJob(string createdBy) =>
+        RunCreateApiStatisticsExcelFileJob(createdBy, false);
 
     /// <summary>
     /// Calculate request statistics

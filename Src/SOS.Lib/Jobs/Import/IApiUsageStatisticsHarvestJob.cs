@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using System.Threading.Tasks;
+using System;
 
 namespace SOS.Lib.Jobs.Import;
 
@@ -22,4 +23,10 @@ public interface IApiUsageStatisticsHarvestJob
     [JobDisplayName("Create API usage statistics Excel file, Id: \"{0}\"")]
     [Queue("low")]
     Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy);
+
+    /// <summary>Create an Excel report with optional taxon list usage and inclusive date bounds.</summary>
+    [JobDisplayName("Create API usage statistics Excel file, Id: \"{0}\"")]
+    [Queue("low")]
+    Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy, bool includeTaxonListUsage,
+        DateTime? fromDate = null, DateTime? toDate = null);
 }

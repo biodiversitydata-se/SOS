@@ -31,6 +31,13 @@ public class TelemetryInitializer : TelemetryInitializerBase
         {
             requestTelemetry.TryAddRequestingSystem(platformContext);
 
+            if (platformContext.Items.TryGetValue("TaxonListIds", out var taxonListIds) &&
+                taxonListIds is string { Length: > 0 } taxonListIdsValue &&
+                !requestTelemetry.Context.GlobalProperties.ContainsKey("TaxonListIds"))
+            {
+                requestTelemetry.Context.GlobalProperties.Add("TaxonListIds", taxonListIdsValue);
+            }
+
             if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
             {
                 requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);

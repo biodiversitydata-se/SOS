@@ -20,6 +20,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
+using SOS.Observations.Api.Attributes;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Validators.Interfaces;
@@ -33,6 +34,7 @@ namespace SOS.Observations.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
+[LogTaxonListIds]
 public class ExportsController : ControllerBase
 {
     private readonly IObservationManager _observationManager;

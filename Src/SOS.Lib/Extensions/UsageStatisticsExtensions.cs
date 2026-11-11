@@ -19,6 +19,7 @@ public static class UsageStatisticsExtensions
                 FailureCount = apiUsageStatisticsRow.FailureCount,
                 Method = apiUsageStatisticsRow.Method,
                 RequestCount = apiUsageStatisticsRow.RequestCount,
+                TaxonListIds = apiUsageStatisticsRow.TaxonListIds,
                 UserId = apiUsageStatisticsRow.UserId
             };
         }

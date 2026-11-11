@@ -117,6 +117,7 @@ public class UsageStatisticsFactory
                 RequestCount = apiUsageStatisticsRow.RequestCount,
                 RequestingSystem = apiUsageStatisticsRow.RequestingSystem,
                 SumResponseCount = apiUsageStatisticsRow.SumResponseCount,
+                TaxonListIds = apiUsageStatisticsRow.TaxonListIds,
                 UserEmail = user?.EmailAddress,
                 UserId = apiUsageStatisticsRow.UserId,
                 UserName = user?.UserName

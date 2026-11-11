@@ -38,11 +38,17 @@ public class ApiUsageStatisticsHarvestJob : IApiUsageStatisticsHarvestJob
     }
 
     /// <inheritdoc />
-    public async Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy)
+    public Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy) =>
+        RunCreateExcelFileReportAsync(reportId, createdBy, false);
+
+    /// <inheritdoc />
+    public async Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy, bool includeTaxonListUsage,
+        DateTime? fromDate = null, DateTime? toDate = null)
     {
         _logger.LogInformation("Start Create API usage statistics Excel file Job");
 
-        var result = await _apiUsageStatisticsManager.CreateExcelFileReportAsync(reportId, createdBy);
+        var result = await _apiUsageStatisticsManager.CreateExcelFileReportAsync(reportId, createdBy,
+            includeTaxonListUsage, fromDate, toDate);
 
         _logger.LogInformation($"End Create API usage statistics Excel file Job. Status: {result}");
 

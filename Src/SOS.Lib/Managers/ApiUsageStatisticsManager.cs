@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -12,6 +13,7 @@ using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -117,12 +119,17 @@ public class ApiUsageStatisticsManager : IApiUsageStatisticsManager
         return true;
     }
 
-    public async Task<bool> CreateExcelFileReportAsync(string reportId, string createdBy)
+    public Task<bool> CreateExcelFileReportAsync(string reportId, string createdBy) =>
+        CreateExcelFileReportAsync(reportId, createdBy, false);
+
+    public async Task<bool> CreateExcelFileReportAsync(string reportId, string createdBy, bool includeTaxonListUsage,
+        DateTime? fromDate = null, DateTime? toDate = null)
     {
+        var range = new ApiUsageStatisticsDateRange(fromDate, toDate);
         try
         {
             var excelWriter = new ApiUsageStatisticsExcelWriter(_apiUsageStatisticsRepository);
-            var excelFile = await excelWriter.CreateStatisticsExcelFile();
+            var excelFile = await excelWriter.CreateStatisticsExcelFile(includeTaxonListUsage, range.FromDate, range.ToDate);
             var report = new Report(reportId)
             {
                 Type = ReportType.ApiUsageStatistics,
@@ -435,7 +442,6 @@ public class ApiUsageStatisticsManager : IApiUsageStatisticsManager
     public class ApiUsageStatisticsExcelWriter
     {
         private readonly IApiUsageStatisticsRepository _apiUsageStatisticsRepository;
-        private const int MaxNumberOfExcelRows = 100000; // The maximun number of rows in a excel sheet.
         private const int DateColumnIndex = 1;
         private const int MethodColumnIndex = 2;
         private const int BaseEndpointColumnIndex = 3;
@@ -459,56 +465,166 @@ public class ApiUsageStatisticsManager : IApiUsageStatisticsManager
             _apiUsageStatisticsRepository = apiUsageStatisticsRepository ?? throw new ArgumentNullException(nameof(apiUsageStatisticsRepository));
         }
 
-        public async Task<byte[]> CreateStatisticsExcelFile()
+        public Task<byte[]> CreateStatisticsExcelFile() => CreateStatisticsExcelFile(false);
+
+        public async Task<byte[]> CreateStatisticsExcelFile(bool includeTaxonListUsage,
+            DateTime? fromDate = null, DateTime? toDate = null)
         {
+            var range = new ApiUsageStatisticsDateRange(fromDate, toDate);
             ExcelPackage.License.SetNonCommercialOrganization("SLU");
             using var package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("API Usage Statistics");
             AddHeaders(sheet);
-            FormatColumns(sheet);
-            await AddData(sheet);
+            var taxonSheet = includeTaxonListUsage ? package.Workbook.Worksheets.Add("Taxon List Usage") : null;
+            await AddData(sheet, taxonSheet, range);
 
             byte[] excelBytes = await package.GetAsByteArrayAsync();
             return excelBytes;
         }
 
-        private async Task AddData(ExcelWorksheet worksheet)
+        private async Task AddData(ExcelWorksheet worksheet, ExcelWorksheet? taxonSheet, ApiUsageStatisticsDateRange range)
         {
-            var rowIndex = 2;
+            var statistics = new Dictionary<(DateTime Date, string Method, string Endpoint, string UserId,
+                string AccountId, string RequestingSystem), StatisticsAggregate>();
+            var taxonUsage = taxonSheet == null ? null : new Dictionary<(DateTime Date, int TaxonListId,
+                string UserId, string AccountId, string RequestingSystem), ApiUsageStatistics>();
 
-            using var cursor = await _apiUsageStatisticsRepository.GetAllByCursorAsync();
+            using var cursor = await _apiUsageStatisticsRepository.GetByDateRangeAsync(range.FromDate, range.ToDate);
             while (await cursor.MoveNextAsync())
             {
-
                 foreach (var row in cursor.Current)
                 {
-                    worksheet.Cells[rowIndex, DateColumnIndex].Value = row.Date;
-                    worksheet.Cells[rowIndex, MethodColumnIndex].Value = row.Method;
-                    worksheet.Cells[rowIndex, BaseEndpointColumnIndex].Value = row.BaseEndpoint;
-                    worksheet.Cells[rowIndex, EndpointColumnIndex].Value = row.Endpoint;
-                    worksheet.Cells[rowIndex, AccountIdColumnIndex].Value = row.AccountId;
-                    worksheet.Cells[rowIndex, AzureApiNameColumnIndex].Value = row.ApiManagementUserName;
-                    worksheet.Cells[rowIndex, AzureApiEmailColumnIndex].Value = row.ApiManagementUserEmail;
-                    worksheet.Cells[rowIndex, AzureApiEmailDomainColumnIndex].Value = row.ApiManagementUserEmailDomain;
-                    worksheet.Cells[rowIndex, UserIdColumnIndex].Value = row.UserId;
-                    worksheet.Cells[rowIndex, UserNameColumnIndex].Value = row.UserName;
-                    worksheet.Cells[rowIndex, UserEmailColumnIndex].Value = row.UserEmail;
-                    worksheet.Cells[rowIndex, UserEmailDomainColumnIndex].Value = row.UserEmailDomain;
-                    worksheet.Cells[rowIndex, RequestCountColumnIndex].Value = row.RequestCount;
-                    worksheet.Cells[rowIndex, FailureCountColumnIndex].Value = row.FailureCount;
-                    worksheet.Cells[rowIndex, AverageDurationColumnIndex].Value = row.AverageDuration;
-                    worksheet.Cells[rowIndex, SumResponseCountColumnIndex].Value = row.SumResponseCount;
-                    worksheet.Cells[rowIndex, RequestingSystemColumnIndex].Value = row.RequestingSystem;
+                    var date = ApiUsageStatisticsDateRange.GetReportDate(row.Date);
+                    var key = (date, row.Method ?? "", row.Endpoint ?? "", row.UserId ?? "", row.AccountId ?? "",
+                        row.RequestingSystem ?? "");
+                    if (!statistics.TryGetValue(key, out var aggregate))
+                    {
+                        aggregate = new StatisticsAggregate { Data = CreateIdentity(row, date) };
+                        statistics.Add(key, aggregate);
+                    }
+                    CopyUserDetails(aggregate.Data, row);
+                    aggregate.Data.RequestCount += row.RequestCount;
+                    aggregate.Data.FailureCount += row.FailureCount;
+                    aggregate.Data.SumResponseCount += row.SumResponseCount;
+                    aggregate.WeightedDuration += (decimal)row.AverageDuration * row.RequestCount;
 
-                    rowIndex++;
+                    if (taxonUsage == null || string.IsNullOrWhiteSpace(row.TaxonListIds)) continue;
+
+                    var uniqueIds = new HashSet<int>();
+                    foreach (var token in row.TaxonListIds.Split(','))
+                    {
+                        if (!int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) ||
+                            !uniqueIds.Add(id)) continue;
+
+                        var taxonKey = (date, id, row.UserId ?? "", row.AccountId ?? "", row.RequestingSystem ?? "");
+                        if (!taxonUsage.TryGetValue(taxonKey, out var usage))
+                        {
+                            usage = CreateIdentity(row, date);
+                            taxonUsage.Add(taxonKey, usage);
+                        }
+                        CopyUserDetails(usage, row);
+                        usage.RequestCount += row.RequestCount;
+                    }
                 }
             }
+
+            var rowIndex = 2;
+            foreach (var aggregate in statistics.Values.OrderBy(value => value.Data.Date)
+                .ThenBy(value => value.Data.Method, StringComparer.Ordinal)
+                .ThenBy(value => value.Data.Endpoint, StringComparer.Ordinal)
+                .ThenBy(value => value.Data.UserId, StringComparer.Ordinal)
+                .ThenBy(value => value.Data.AccountId, StringComparer.Ordinal)
+                .ThenBy(value => value.Data.RequestingSystem, StringComparer.Ordinal))
+            {
+                var row = aggregate.Data;
+                row.AverageDuration = row.RequestCount == 0 ? 0 : (long)(aggregate.WeightedDuration / row.RequestCount);
+                worksheet.Cells[rowIndex, DateColumnIndex].Value = row.Date;
+                worksheet.Cells[rowIndex, MethodColumnIndex].Value = row.Method;
+                worksheet.Cells[rowIndex, BaseEndpointColumnIndex].Value = row.BaseEndpoint;
+                worksheet.Cells[rowIndex, EndpointColumnIndex].Value = row.Endpoint;
+                worksheet.Cells[rowIndex, AccountIdColumnIndex].Value = row.AccountId;
+                worksheet.Cells[rowIndex, AzureApiNameColumnIndex].Value = row.ApiManagementUserName;
+                worksheet.Cells[rowIndex, AzureApiEmailColumnIndex].Value = row.ApiManagementUserEmail;
+                worksheet.Cells[rowIndex, AzureApiEmailDomainColumnIndex].Value = row.ApiManagementUserEmailDomain;
+                worksheet.Cells[rowIndex, UserIdColumnIndex].Value = row.UserId;
+                worksheet.Cells[rowIndex, UserNameColumnIndex].Value = row.UserName;
+                worksheet.Cells[rowIndex, UserEmailColumnIndex].Value = row.UserEmail;
+                worksheet.Cells[rowIndex, UserEmailDomainColumnIndex].Value = row.UserEmailDomain;
+                worksheet.Cells[rowIndex, RequestCountColumnIndex].Value = row.RequestCount;
+                worksheet.Cells[rowIndex, FailureCountColumnIndex].Value = row.FailureCount;
+                worksheet.Cells[rowIndex, AverageDurationColumnIndex].Value = row.AverageDuration;
+                worksheet.Cells[rowIndex, SumResponseCountColumnIndex].Value = row.SumResponseCount;
+                worksheet.Cells[rowIndex, RequestingSystemColumnIndex].Value = row.RequestingSystem;
+                rowIndex++;
+            }
+            FormatColumns(worksheet, rowIndex - 1);
+
+            if (taxonSheet == null) return;
+
+            var headers = new[] { "Date", "TaxonListId", "AccountId", "AzureApiName", "AzureApiEmail",
+                "AzureApiEmailDomain", "UserId", "UserName", "UserEmail", "UserEmailDomain", "RequestingSystem", "RequestCount" };
+            for (var column = 0; column < headers.Length; column++)
+                taxonSheet.Cells[1, column + 1].Value = headers[column];
+            StyleHeaders(taxonSheet, headers.Length);
+
+            rowIndex = 2;
+            foreach (var item in taxonUsage!.OrderBy(value => value.Key.Date).ThenBy(value => value.Key.TaxonListId)
+                .ThenBy(value => value.Key.UserId, StringComparer.Ordinal)
+                .ThenBy(value => value.Key.AccountId, StringComparer.Ordinal)
+                .ThenBy(value => value.Key.RequestingSystem, StringComparer.Ordinal))
+            {
+                var row = item.Value;
+                taxonSheet.Cells[rowIndex, 1].Value = row.Date;
+                taxonSheet.Cells[rowIndex, 2].Value = item.Key.TaxonListId;
+                taxonSheet.Cells[rowIndex, 3].Value = row.AccountId;
+                taxonSheet.Cells[rowIndex, 4].Value = row.ApiManagementUserName;
+                taxonSheet.Cells[rowIndex, 5].Value = row.ApiManagementUserEmail;
+                taxonSheet.Cells[rowIndex, 6].Value = row.ApiManagementUserEmailDomain;
+                taxonSheet.Cells[rowIndex, 7].Value = row.UserId;
+                taxonSheet.Cells[rowIndex, 8].Value = row.UserName;
+                taxonSheet.Cells[rowIndex, 9].Value = row.UserEmail;
+                taxonSheet.Cells[rowIndex, 10].Value = row.UserEmailDomain;
+                taxonSheet.Cells[rowIndex, 11].Value = row.RequestingSystem;
+                taxonSheet.Cells[rowIndex, 12].Value = row.RequestCount;
+                rowIndex++;
+            }
+            if (rowIndex > 2)
+            {
+                taxonSheet.Cells[2, 1, rowIndex - 1, 1].Style.Numberformat.Format = "yyyy-MM-dd";
+                taxonSheet.Cells[2, 2, rowIndex - 1, 2].Style.Numberformat.Format = "0";
+                taxonSheet.Cells[2, 12, rowIndex - 1, 12].Style.Numberformat.Format = "0";
+            }
+            taxonSheet.Cells[1, 1, rowIndex - 1, headers.Length].AutoFilter = true;
         }
 
-        private void FormatColumns(ExcelWorksheet worksheet)
+        private static ApiUsageStatistics CreateIdentity(ApiUsageStatistics row, DateTime date) => new()
+        {
+            Date = date,
+            Method = row.Method,
+            Endpoint = row.Endpoint,
+            UserId = row.UserId,
+            AccountId = row.AccountId,
+            RequestingSystem = row.RequestingSystem
+        };
+
+        private static void CopyUserDetails(ApiUsageStatistics target, ApiUsageStatistics source)
+        {
+            if (string.IsNullOrWhiteSpace(target.UserName)) target.UserName = source.UserName;
+            if (string.IsNullOrWhiteSpace(target.UserEmail)) target.UserEmail = source.UserEmail;
+            if (string.IsNullOrWhiteSpace(target.ApiManagementUserName)) target.ApiManagementUserName = source.ApiManagementUserName;
+            if (string.IsNullOrWhiteSpace(target.ApiManagementUserEmail)) target.ApiManagementUserEmail = source.ApiManagementUserEmail;
+        }
+
+        private sealed class StatisticsAggregate
+        {
+            public ApiUsageStatistics Data { get; init; }
+            public decimal WeightedDuration { get; set; }
+        }
+
+        private void FormatColumns(ExcelWorksheet worksheet, int lastDataRow)
         {
             const int firstDataRow = 2;
-            var lastDataRow = MaxNumberOfExcelRows + 1;
+            if (lastDataRow < firstDataRow) return;
 
             worksheet.Cells[firstDataRow, DateColumnIndex, lastDataRow, DateColumnIndex].Style.Numberformat.Format = "yyyy-MM-dd";
             worksheet.Cells[firstDataRow, RequestCountColumnIndex, lastDataRow, RequestCountColumnIndex].Style.Numberformat.Format = "0";
@@ -535,9 +651,12 @@ public class ApiUsageStatisticsManager : IApiUsageStatisticsManager
             worksheet.Cells[1, FailureCountColumnIndex].Value = "FailureCount";
             worksheet.Cells[1, AverageDurationColumnIndex].Value = "AverageDuration";
             worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";
+            StyleHeaders(worksheet, SumResponseCountColumnIndex);
+        }
 
-            // Format style by columns in first row
-            using (var range = worksheet.Cells[1, 1, 1, SumResponseCountColumnIndex])
+        private static void StyleHeaders(ExcelWorksheet worksheet, int lastColumn)
+        {
+            using (var range = worksheet.Cells[1, 1, 1, lastColumn])
             {
                 range.Style.Font.Bold = false;
                 range.Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));

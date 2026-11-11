@@ -75,6 +75,7 @@ public class ApplicationInsightsService : IApplicationInsightsService
                         user_AccountId,
                         user_AuthenticatedId,
                         requestingSystem = tostring(customDimensions['Requesting-System']),                        
+                        taxonListIds = tostring(customDimensions['TaxonListIds']),
                         duration, 
                         success,
                         observationCount = toint(customDimensions['Observation-count'])
@@ -88,7 +89,8 @@ public class ApplicationInsightsService : IApplicationInsightsService
                             endpoint,
                             user_AccountId,
                             user_AuthenticatedId,
-                            requestingSystem";
+                            requestingSystem,
+                            taxonListIds";
 
         var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
@@ -101,10 +103,11 @@ public class ApplicationInsightsService : IApplicationInsightsService
                 AccountId = ((JsonElement)r[2]).GetString(),
                 UserId = ((JsonElement)r[3]).GetString(),
                 RequestingSystem = ((JsonElement)r[4]).GetString(),
-                RequestCount = ((JsonElement)r[5]).GetInt64(),
-                FailureCount = ((JsonElement)r[6]).GetInt64(),
-                AverageDuration = ((JsonElement)r[7]).GetInt64(),
-                SumResponseCount = ((JsonElement)r[8]).GetInt64()
+                TaxonListIds = ((JsonElement)r[5]).GetString(),
+                RequestCount = ((JsonElement)r[6]).GetInt64(),
+                FailureCount = ((JsonElement)r[7]).GetInt64(),
+                AverageDuration = ((JsonElement)r[8]).GetInt64(),
+                SumResponseCount = ((JsonElement)r[9]).GetInt64()
             });
     }
 

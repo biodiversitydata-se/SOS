@@ -81,6 +81,12 @@ public class ApiUsageStatistics : IEntity<ObjectId>
     public long SumResponseCount { get; set; }
 
     /// <summary>
+    /// Sorted, unique taxon list identifiers used in the request filter, separated by commas.
+    /// Null for older statistics where taxon lists were not recorded.
+    /// </summary>
+    public string? TaxonListIds { get; set; }
+
+    /// <summary>
     /// E-mail to user making the request
     /// </summary>
     public string UserEmail { get; set; }
