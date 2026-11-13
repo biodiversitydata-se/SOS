@@ -7,6 +7,8 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 ## API usage documentation
 - [Endpoints](Endpoints.md)
 - [Search filter parameters](SearchFilter.md)
+- [Exports](Exports.md)
+- [Harvesting and pagination with ObservationsByCursor](ObservationsByCursor.md)
 - [Authentication](Authentication.md)
 - [FAQ](FAQ.md)
 

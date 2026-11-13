@@ -1,4 +1,6 @@
 # Exports
+For programmatic harvesting or pagination of up to 2 million observations, use [ObservationsByCursor](ObservationsByCursor.md). It returns observations as JSON, one page at a time. The endpoints below provide downloadable files instead.
+
 The supported file formats in exports are: CSV, GeoJSON, Excel and Darwin Core Archive (DwC-A). 
 The observations will use a [flat observation structure](FlatObservation.md) in the formats CSV, GeoJSON and Excel (_In GeoJSON, the structure can be hierachical if the parameter flat=false_).
 
@@ -16,6 +18,16 @@ The observations will use a [flat observation structure](FlatObservation.md) in 
 | /Exports/Order/GeoJson 	| Exports_OrderGeoJson 	| POST 	| Starts GeoJSON aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
 | /Exports/Order/Excel 	| Exports_OrderExcel 	| POST 	| Starts Excel aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
 | /Exports/Order/DwC 	| Exports_OrderDwC 	| POST 	| Starts DwC-A aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
+
+## Download prebuilt DwC-A datasets
+
+For extractions larger than 2 million observations, or when you want to filter a large dataset locally, use a prebuilt Darwin Core Archive (DwC-A). These downloads do not have the 2 million observation limit that applies to cursor pagination and asynchronous file orders.
+
+1. Call `GET /Exports/Datasets` using the [API portal](https://api-portal.artdatabanken.se/api-details#api=sos-api-v1&operation=Exports_GetDatasetsList).
+2. Select the entry whose `name` is `sos.dwca.zip` for the complete SOS DwC-A export, or choose a data provider dataset.
+3. Download the file from the entry's `downloadUrl`, extract it and filter the observations locally.
+
+Each entry includes `created` and `size` (in bytes), so you can check the file's age and size before downloading. Files are usually generated once a day. The DwC-A export contains Darwin Core fields; it does not include every field available in the SOS observation JSON structure.
 
 ## Parameters
 | Name | Description | Applies to |

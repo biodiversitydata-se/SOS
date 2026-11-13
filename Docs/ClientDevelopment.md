@@ -169,7 +169,7 @@ Information about different data providers and datasets for SOS can be found und
 Environment describes the current environment in which SOS is operated.
 
 ### Exports
-SOS is a REST API and is not intended to be used as a data source for bulk downloads. If you are interested in large data sets, we recommend using exports. There are pre-built datasets available in DwC-A format for all DataProviders, and you can also define custom queries to download larger datasets in various formats. Currently, you can directly generate files with up to 100,000 observations. If you need more data, you can request files with up to 2,000,000 observations.
+For downloads as files, use [exports](Exports.md). For programmatic harvesting or pagination of up to 2,000,000 matching observations, use [ObservationsByCursor](ObservationsByCursor.md). Prebuilt datasets in DwC-A format are available for larger extractions and local filtering, and you can also define custom queries to order files in various formats.
 
 ### Jobs
 When placing a file order, you receive a job ID. This ID can be used to check the status of the job that generates the file.

@@ -11,6 +11,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Endpoints](Docs/Endpoints.md)
 - [Search filter parameters](Docs/SearchFilter.md)
 - [Exports](Docs/Exports.md)
+- [Harvesting and pagination with ObservationsByCursor](Docs/ObservationsByCursor.md)
 - [Locations](Docs/Locations.md)
 - [Authentication](Docs/Authentication.md)
 - [Checklists](Docs/Checklists.md)

@@ -1,10 +1,11 @@
-﻿# Endpoints
+# Endpoints
 The following endpoints exists in Species Observation System API (SOS):
 
 | Resource URL | Name | Method | Description |
 |:---|:---|:---|:---|
 |**Observations**| | | | 
 | /Observations/Search | Observations_ObservationsBySearch | POST | Get observations matching the provided search filter. |
+| /Observations/SearchByCursor | Observations_ObservationsByCursor | POST | Get large numbers of observations page by page using a cursor. See [ObservationsByCursor](ObservationsByCursor.md). |
 | /Observations/Count | Observations_Count | POST | Count the number of observations matching the provided search filter. |
 | /Observations/\{occurrenceId\} | Observations_GetObservationById | GET | Get a single observation. |
 | /Observations/GeoGridAggregation | Observations_GeogridAggregation | POST | Aggregate observations into grid cells. |
