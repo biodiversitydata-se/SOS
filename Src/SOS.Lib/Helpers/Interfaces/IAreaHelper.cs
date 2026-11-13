@@ -14,14 +14,16 @@ public interface IAreaHelper
     ///     Add area data to processed location model
     /// </summary>
     /// <param name="processedLocation"></param>
-    void AddAreaDataToProcessedLocation(Location processedLocation);
+    /// <param name="uncertainAreaTypes">Area types that cannot be determined from the coordinates and should be set to null.</param>
+    void AddAreaDataToProcessedLocation(Location processedLocation, params AreaType[] uncertainAreaTypes);
 
     /// <summary>
     ///     Add area data to processed observation models
     /// </summary>
     /// <param name="processedLocations"></param>
+    /// <param name="uncertainAreaTypes">Area types that cannot be determined from the coordinates and should be set to null.</param>
     /// <returns></returns>
-    void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations);
+    void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations, params AreaType[] uncertainAreaTypes);
 
     /// <summary>
     /// Add area data to site

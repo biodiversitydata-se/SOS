@@ -27,6 +27,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
     private readonly ILogger _logger;
     private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
     private IDictionary<string, (double longitude, double latitude, int precision)>? _parishes;
+    private IDictionary<string, (double longitude, double latitude, int precision)>? _provinces;
     private IDictionary<string, (double longitude, double latitude, int? precision, string? locationRemarks)>? _matchLookup;
     private string _englishOrganizationName;
     private string _englishOrganizationNameLowerCase;
@@ -36,7 +37,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
     private readonly Dictionary<int, int> _communityPrecisionDistribution = new();
     private readonly Dictionary<int, int> _parishPrecisionDistribution = new();
 
-    private enum GeoCoordinateSource { NotFound, VerbatimCoordinates, DistrictCommunity, DistrictParish, LocationCommunity, LocationParish, MatchFile }
+    private enum GeoCoordinateSource { NotFound, VerbatimCoordinates, DistrictCommunity, DistrictParish, LocationCommunity, LocationParish, MatchFile, Province }
 
     private static string GetMatchDescription(GeoCoordinateSource source) => source switch
     {
@@ -46,6 +47,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
         GeoCoordinateSource.LocationCommunity => "Location=>Community",
         GeoCoordinateSource.LocationParish => "Location=>Parish",
         GeoCoordinateSource.MatchFile => "MatchFile",
+        GeoCoordinateSource.Province => "Province",
         _ => "No match"
     };
 
@@ -102,6 +104,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
     {
         _communities = await GetAreaLookupAsync(AreaType.Community);
         _parishes = await GetAreaLookupAsync(AreaType.Parish);
+        _provinces = await GetAreaLookupAsync(AreaType.Province);
         _matchLookup = LoadMatchFileLookup();
     }
 
@@ -220,28 +223,32 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
             geoSource = GeoCoordinateSource.VerbatimCoordinates;
         }
 
-        if ((latitude == null || latitude == 0 || longitude == null || longitude == 0) && 
-            !string.IsNullOrEmpty(verbatim.District) && !string.IsNullOrEmpty(verbatim.Province))
+        if ((latitude == null || latitude == 0 || longitude == null || longitude == 0)
+            && !string.IsNullOrEmpty(verbatim.Province))
         {
-            // Remove bracket content from District, t.ex. "Råda [Härryda kommun]" -> "Råda"
-            var cleanDistrict = RemoveBracketContent(verbatim.District);
-            var lookupKey = $"{verbatim.Province}-{cleanDistrict}".ToLower();
+            if (!string.IsNullOrEmpty(verbatim.District))
+            {
+                // Remove bracket content from District, t.ex. "Råda [Härryda kommun]" -> "Råda"
+                var cleanDistrict = RemoveBracketContent(verbatim.District);
+                var lookupKey = $"{verbatim.Province}-{cleanDistrict}".ToLower();
 
-            if (_communities?.TryGetValue(lookupKey, out var community) ?? false)
-            {
-                longitude = community.longitude;
-                latitude = community.latitude;
-                coordinatePrecision = community.precision;
-                geoSource = GeoCoordinateSource.DistrictCommunity;
+                if (_communities?.TryGetValue(lookupKey, out var community) ?? false)
+                {
+                    longitude = community.longitude;
+                    latitude = community.latitude;
+                    coordinatePrecision = community.precision;
+                    geoSource = GeoCoordinateSource.DistrictCommunity;
+                }
+                else if (_parishes?.TryGetValue(lookupKey, out var parish) ?? false)
+                {
+                    longitude = parish.longitude;
+                    latitude = parish.latitude;
+                    coordinatePrecision = parish.precision;
+                    geoSource = GeoCoordinateSource.DistrictParish;
+                }
             }
-            else if (_parishes?.TryGetValue(lookupKey, out var parish) ?? false)
-            {
-                longitude = parish.longitude;
-                latitude = parish.latitude;
-                coordinatePrecision = parish.precision;
-                geoSource = GeoCoordinateSource.DistrictParish;
-            }
-            else if (!string.IsNullOrEmpty(verbatim.Location))
+
+            if (geoSource == GeoCoordinateSource.NotFound && !string.IsNullOrEmpty(verbatim.Location))
             {
                 var cleanLocation = RemoveBracketContent(verbatim.Location);
                 var locationLookupKey = $"{verbatim.Province}-{cleanLocation}".ToLower();
@@ -262,7 +269,11 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 }
             }
         }
-        
+
+
+        AreaType[] uncertainAreaTypes = [];
+
+        // If no geomatch, try get match from VirtualHerbariumMatch.tsv
         if (geoSource == GeoCoordinateSource.NotFound && !string.IsNullOrEmpty(verbatim.Province))
         {
             var districtKey = !string.IsNullOrEmpty(verbatim.District)
@@ -270,6 +281,9 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 : null;
             var locationKey = !string.IsNullOrEmpty(verbatim.Location)
                 ? $"{verbatim.Province}-{RemoveBracketContent(verbatim.Location)}".ToLower()
+                : null;
+            var provinceKey = string.IsNullOrEmpty(verbatim.Location) && string.IsNullOrEmpty(verbatim.District)
+                ? verbatim.Province.ToLower()
                 : null;
 
             (double longitude, double latitude, int? precision, string? locationRemarks) matchEntry = default;
@@ -282,7 +296,47 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 obs.Location.LocationRemarks = matchEntry.locationRemarks;
                 geoSource = GeoCoordinateSource.MatchFile;
             }
+            else if (provinceKey != null && (_matchLookup?.TryGetValue(provinceKey, out matchEntry) ?? false))
+            {
+                _logger.LogInformation("Using province-level match for observation {Id} with no district or location. Province: {Province}, OccurrenceId: {OccurrenceId}", verbatim.Id, verbatim.Province, obs.Occurrence.OccurrenceId);
+                longitude = matchEntry.longitude;
+                latitude = matchEntry.latitude;
+                coordinatePrecision = matchEntry.precision;
+                obs.Location.LocationRemarks = matchEntry.locationRemarks;
+                geoSource = GeoCoordinateSource.MatchFile;
+                uncertainAreaTypes =
+                [
+                    AreaType.Atlas5x5,
+                    AreaType.Atlas10x10,
+                    AreaType.Parish,
+                    AreaType.Municipality,
+                    AreaType.County
+                ];
+            }
         }
+
+        //// If no geomatch, try get match from Province when Location is empty
+        //if (geoSource == GeoCoordinateSource.NotFound
+        //    && !string.IsNullOrEmpty(verbatim.Province)
+        //    && string.IsNullOrEmpty(verbatim.Location))
+        //{
+        //    if (_provinces?.TryGetValue(verbatim.Province, out var province) ?? false)
+        //    {
+        //        longitude = province.longitude;
+        //        latitude = province.latitude;
+        //        coordinatePrecision = province.precision;
+        //        obs.Location.LocationRemarks = "Location could only be matched at province level.";
+        //        geoSource = GeoCoordinateSource.Province;
+        //        uncertainAreaTypes =
+        //        [
+        //            AreaType.Atlas5x5,
+        //            AreaType.Atlas10x10,
+        //            AreaType.Parish,
+        //            AreaType.Municipality,
+        //            AreaType.County
+        //        ];
+        //    }
+        //}
 
         obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
         obs.InstitutionCode = _institutionCodeVocabularyValue;
@@ -292,7 +346,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
             AddPositionData(obs.Location, longitude.Value, latitude.Value, CoordinateSys.WGS84, coordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
         }
 
-        _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
+        _areaHelper.AddAreaDataToProcessedLocation(obs.Location, uncertainAreaTypes);
 
         // Update geo statistics       
         _geoRows.Add(new Models.VirtualHerbariumGeoRow
@@ -620,17 +674,25 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 var key = $"{province}-{location}".ToLower();
                 dic.TryAdd(key, (lon, lat, uncertainty, locationRemarks));
             }
+
+            if (string.IsNullOrEmpty(location) && string.IsNullOrEmpty(district))
+            {
+                var key = province.ToLower();
+                dic.TryAdd(key, (lon, lat, uncertainty, locationRemarks));
+            }
+
         }
 
         return dic;
     }
 
     /// <summary>
-    ///     Get area lookup dictionary for given area type
+    ///     Get area lookup dictionary for given area type. Provinces are keyed by name;
+    ///     other area types are keyed by province and area name.
     /// </summary>
     private async Task<IDictionary<string, (double longitude, double latitude, int precision)>?> GetAreaLookupAsync(AreaType areaType)
     {
-        var dic = new Dictionary<string, (double longitude, double latitude, int precision)>();
+        var dic = new Dictionary<string, (double longitude, double latitude, int precision)>(StringComparer.OrdinalIgnoreCase);
         IEnumerable<Lib.Models.Shared.Area>? areas = await _areaHelper.GetAreasAsync(areaType);
 
         if (!areas?.Any() ?? true)
@@ -638,7 +700,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
             return null;
         }
 
-        var duplicates = new HashSet<string>();
+        var duplicates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var area in areas!)
         {
@@ -648,14 +710,16 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 continue;
             }
 
-            var centroid = geometry.Centroid;
+            var representativePoint = areaType == AreaType.Province
+                ? geometry.InteriorPoint
+                : geometry.Centroid;
             var maxDistance = 0d;
-            var maxPoint = centroid;
+            var maxPoint = representativePoint;
 
-            // Find point most far away from centroid
+            // Find point most far away from the representative point
             foreach (var coordinate in geometry.Coordinates)
             {
-                var distance = centroid.Coordinate.Distance(coordinate);
+                var distance = representativePoint.Coordinate.Distance(coordinate);
                 if (distance > maxDistance)
                 {
                     maxDistance = distance;
@@ -666,48 +730,63 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
             var maxDistanceInM = 0;
             if (maxDistance > 0)
             {
-                maxDistanceInM = (int)centroid
+                maxDistanceInM = (int)representativePoint
                     .Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM)
                     .Distance(maxPoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM));
             }
 
-            // Get point county, parish etc
-            var features = _areaHelper.GetPointFeatures(geometry.Centroid);
-            if (!features?.Any() ?? true)
+            string key;
+            if (areaType == AreaType.Province)
+            {
+                if (string.IsNullOrWhiteSpace(area.Name))
+                {
+                    continue;
+                }
+
+                key = area.Name.Trim();
+            }
+            else
+            {
+                // Get point county, parish etc
+                var features = _areaHelper.GetPointFeatures(representativePoint);
+                if (!features?.Any() ?? true)
+                {
+                    continue;
+                }
+
+                var provinceName = string.Empty;
+                foreach (var feature in features!)
+                {
+                    var attributes = feature.Attributes as NetTopologySuite.Features.AttributesTable;
+                    if (((AreaType)attributes!["areaType"]) == AreaType.Province)
+                    {
+                        provinceName = attributes["name"]?.ToString();
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(provinceName))
+                {
+                    continue;
+                }
+
+                key = $"{provinceName.Trim()}-{area.Name.Trim()}";
+            }
+
+            // If a key exists more than once, we can't use it to determine position
+            if (duplicates.Contains(key))
             {
                 continue;
             }
 
-            var provinceName = string.Empty;
-            foreach (var feature in features!)
+            if (dic.ContainsKey(key))
             {
-                var attributes = feature.Attributes as NetTopologySuite.Features.AttributesTable;
-                if (((AreaType)attributes!["areaType"]) == AreaType.Province)
-                {
-                    provinceName = attributes["name"]?.ToString();
-                    break;
-                }
+                dic.Remove(key);
+                duplicates.Add(key);
+                continue;
             }
 
-            if (!string.IsNullOrEmpty(provinceName))
-            {
-                var key = $"{provinceName.Trim()}-{area.Name.Trim()}".ToLower();
-
-                // If combination of province and community exists more than once, we can't use it to determine position
-                if (duplicates.Contains(key))
-                {
-                    continue;
-                }
-
-                if (dic.ContainsKey(key))
-                {
-                    dic.Remove(key);
-                    duplicates.Add(key);
-                    continue;
-                }
-
-                dic.Add(key, (centroid.X, centroid.Y, maxDistanceInM));
-            }
+            dic.Add(key, (representativePoint.X, representativePoint.Y, maxDistanceInM));
         }
 
         return dic;

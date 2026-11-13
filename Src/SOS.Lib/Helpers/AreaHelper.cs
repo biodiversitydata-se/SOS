@@ -159,7 +159,7 @@ public class AreaHelper : IAreaHelper
     }
 
     /// <inheritdoc />
-    public void AddAreaDataToProcessedLocation(Location processedLocation)
+    public void AddAreaDataToProcessedLocation(Location processedLocation, params AreaType[] uncertainAreaTypes)
     {
         if ((processedLocation?.DecimalLongitude ?? 0) == 0
             || (processedLocation?.DecimalLatitude ?? 0) == 0)
@@ -169,29 +169,34 @@ public class AreaHelper : IAreaHelper
 
         var positionLocations = GetPositionLocations(processedLocation.DecimalLongitude.Value,
             processedLocation.DecimalLatitude.Value);
-        processedLocation.Atlas5x5 = positionLocations?.Atlas5x5;
-        processedLocation.Atlas10x10 = positionLocations?.Atlas10x10;
-        processedLocation.CountryRegion = positionLocations?.CountryRegion;
-        processedLocation.County = positionLocations?.County;
-        processedLocation.Municipality = positionLocations?.Municipality;
-        processedLocation.Parish = positionLocations?.Parish;
-        processedLocation.Province = positionLocations?.Province;
+        var uncertainAreaTypeSet = uncertainAreaTypes?.ToHashSet() ?? [];
+
+        processedLocation.Atlas5x5 = uncertainAreaTypeSet.Contains(AreaType.Atlas5x5) ? null : positionLocations?.Atlas5x5;
+        processedLocation.Atlas10x10 = uncertainAreaTypeSet.Contains(AreaType.Atlas10x10) ? null : positionLocations?.Atlas10x10;
+        processedLocation.CountryRegion = uncertainAreaTypeSet.Contains(AreaType.CountryRegion) ? null : positionLocations?.CountryRegion;
+        processedLocation.County = uncertainAreaTypeSet.Contains(AreaType.County) ? null : positionLocations?.County;
+        processedLocation.Municipality = uncertainAreaTypeSet.Contains(AreaType.Municipality) ? null : positionLocations?.Municipality;
+        processedLocation.Parish = uncertainAreaTypeSet.Contains(AreaType.Parish) ? null : positionLocations?.Parish;
+        processedLocation.Province = uncertainAreaTypeSet.Contains(AreaType.Province) ? null : positionLocations?.Province;
         processedLocation.IsInEconomicZoneOfSweden = positionLocations?.EconomicZoneOfSweden ?? false;
         processedLocation.IsInZoneOfSOS = positionLocations?.ZoneOfSOS ?? false;
 
-        processedLocation.Attributes.ProvincePartIdByCoordinate =
-            GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
+        processedLocation.Attributes.ProvincePartIdByCoordinate = uncertainAreaTypeSet.Contains(AreaType.Province)
+            ? null
+            : GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
 
-        processedLocation.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
-            processedLocation.County?.FeatureId, processedLocation.Province?.FeatureId);
+        processedLocation.Attributes.CountyPartIdByCoordinate = uncertainAreaTypeSet.Contains(AreaType.County)
+            || uncertainAreaTypeSet.Contains(AreaType.Province)
+                ? null
+                : GetCountyPartIdByCoordinate(processedLocation.County?.FeatureId, processedLocation.Province?.FeatureId);
     }
 
     /// <inheritdoc />
-    public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations)
+    public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations, params AreaType[] uncertainAreaTypes)
     {
         foreach (var processedLocation in processedLocations)
         {
-            AddAreaDataToProcessedLocation(processedLocation);
+            AddAreaDataToProcessedLocation(processedLocation, uncertainAreaTypes);
         }
     }
 

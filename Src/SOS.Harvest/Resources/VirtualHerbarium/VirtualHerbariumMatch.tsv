@@ -1,6 +1,6 @@
-﻿Province (verbatim)	District (verbatim)	Location (verbatim)	CoordinateUncertaintyInMeters	DecimalLatitude	DecimalLongitude	LocationRemarks	Count	Match
-Skåne						Provins	5936	No match
-Uppland						Provins	4459	No match
+Province (verbatim)	District (verbatim)	Location (verbatim)	CoordinateUncertaintyInMeters	DecimalLatitude	DecimalLongitude	LocationRemarks	Count	Match
+Skåne			120000	55.704084	 13.193625	Matchning på provins. Koordinatsatt på Lunds domkyrka	5936	Match
+Uppland			140000	59.858124	 17.633507	Matchning på provins. Koordinatsatt på Uppsala domkyrka	4459	Match
 Västerbotten	Umeå		38292	63.89959	20.15996	Sockenkoordinat för Umeå sn. Se kommentarsfält för mer exakt lokal	3182	Match
 Göteborg	Göteborg		50000	57.70458	11.96527	Koordinat för Göteborg på Gustavi domkyrka. Om bara fyndplats Göteborg är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	2834	No match
 Södermanland	Stockholm		10000	59.31709	18.07815	Sockenkoordinat för Stockholm (Södermanland). Se kommentarsfält för mer exakt lokal	2700	Match
@@ -8,38 +8,38 @@ Södermanland / Uppland	Stockholm	Stockholm	50000	59.32581	18.07042	Koordinat f�
 Norrbotten	Piteå		59769	65.41439	20.62801	Sockenkoordinat för Piteå sn. Se kommentarsfält för mer exakt lokal	2453	Match
 Västergötland		Kinnekulle	7000	58.59791	13.40756	Socken okänd. Koordinat mittpunkt på Kinnekulle, som ligger i Österplana och Medelplana socknar. 	2220	Match
 Östergötland		Omberg	6000	58.33411	14.66662	Socken okänd. Koordinat mittpunkt på Omberg	2071	Match
-Öland						Provins	2027	No match
-Gotland						Provins	1987	No match
-Västergötland						Provins	1889	No match
-Småland						Provins	1864	No match
-Östergötland						Provins	1714	No match
-Bohuslän						Provins	1687	No match
-Södermanland						Provins	1483	No match
-Lule lappmark						Provins	1364	No match
-Värmland						Provins	1191	No match
+Öland			80000	56.88023	16.65624	Matchning på provins. Koordinatsatt på Borgholms kyrka	2027	Match
+Gotland			120000	57.641818	 18.298073	Matchning på provins. Koordinatsatt på Visby sankta maria domkyrka	1987	Match
+Västergötland			150000	58.38652	 13.43921	Matchning på provins. Koordinatsatt på Skara domkyrka	1889	Match
+Småland			200000	56.877405	 14.812081	Matchning på provins. Koordinatsatt på Växjö domkyrka	1864	Match
+Östergötland			90000	58.41125	15.61749	Matchning på provins. Koordinatsatt på Linköpings domkyrka	1714	Match
+Bohuslän			85000	58.359165	 11.253068	Matchning på provins. Koordinatsatt på Kungshamns kyrka	1687	Match
+Södermanland			130000	59.375572	 17.034559	Matchning på provins. Koordinatsatt på Strängnäs domkyrka	1483	Match
+Lule lappmark			200000	66.604996	 19.841866	Matchning på provins. Koordinatsatt på Jokkmokks nya kyrka	1364	Match
+Värmland			200000	59.381518	 13.506467	Matchning på provins. Koordinatsatt på Karlstads domkyrka	1191	Match
 Hälsingland	Los		10000	61.72652	15.17547	Sockenkoordinat för Los sn. Se kommentarsfält för mer exakt lokal	1176	Match
 Västerbotten	Skellefteå		38797	64.78509	20.67859	Sockenkoordinat för Skellefteå sn. Se kommentarsfält för mer exakt lokal	1100	Match
-Torne lappmark						Provins	954	No match
+Torne lappmark			143000	67.846616	 20.621263	Matchning på provins. Koordinatsatt på Jukkasjärvi kyrka	954	Match
 Västmanland	Arboga		7142	59.38065	15.90158	Sockenkoordinat för Arboga sn. Se kommentarsfält för mer exakt lokal	908	Match
-Jämtland						Provins	863	No match
+Jämtland			220000	63.178609	 14.639572	Matchning på provins. Koordinatsatt på gamla kyrkan i Östersund	863	Match
 Västergötland		Mösseberg	4000	58.19722	13.49320	Socken okänd. Koordinat mittpunkt på Mösseberg	861	Ambiguous
-Blekinge						Provins	853	No match
-Halland						Provins	789	No match
+Blekinge			70000	56.211758	 15.278496	Matchning på provins. Koordinatsatt på Heliga Kors kyrka i Ronneby	853	Match
+Halland			90000	56.902078	 12.489567	Matchning på provins. Koordinatsatt på Falkenbergskyrkan	789	Match
 Öland		Öland				Provins	758	Match-but no coordinates
 Göteborg	Västra Frölunda		5000	57.64886	11.92117	Sockenkoordinat för Västra Frölunda sn. Se kommentarsfält för mer exakt lokal	744	Match
 Småland	Ljungby					Oklart vilket Ljungby som avses	647	Ambiguous
 Uppland		Uppsala				Provins	571	Ambiguous
 Västmanland	Västanfors		5000	59.98784	15.80651	Sockenkoordinat för Västanfors sn. Se kommentarsfält för mer exakt lokal	529	Match
 Västergötland		Billingen				Provins	510	Ambiguous
-Dalarna						Provins	501	No match
+Dalarna			190000	61.007213	 14.541521	Matchning på provins. Koordinatsatt på Mora kyrka	501	Match
 Skåne	Falsterbo		2000	55.38978	12.83806	Sockenkoordinat för Falsterbo sn. Se kommentarsfält för mer exakt lokal	492	Match
-Närke						Provins	482	No match
+Närke			75000	59.27229	15.21112	Matchning på provins. Koordinatsatt på Sankt Nikolai kyrka i Örebro	482	Match
 Västergötland		Hunneberg	5000	58.32683	12.45946	Mittpunktkoordinat på Hunneberg. Församling, kommun ej angivet taget från koordinaten.	457	Ambiguous
 Västergötland		Halleberg	4000	58.37995	12.44604	Mittpunktkoordinat på Halleberg. Församling, kommun ej angivet taget från koordinaten.	456	Ambiguous
 Norrbotten	Muonionalusta		20000	67.94546	23.43365	Sockenkoordinat för Muonionalusta sn. Se kommentarsfält för mer exakt lokal	456	Match
 Småland	Ljungby [Kalmar kommun]	Ljungbyholm	200	56.62967	16.16369		431	Match
 Norrbotten	Svanstein		10000	66.65406	23.85612	Sockenkoordinat för Svanstein sn. Se kommentarsfält för mer exakt lokal	408	Match
-Härjedalen						Provins	405	No match
+Härjedalen			150000	62.034011	 14.362221	Matchning på provins. Koordinatsatt på Svegs kyrka	405	Match
 Skåne		Skåne				Provins	393	Match-but no coordinates
 Göteborg	Fässberg		5000	57.65604	12.01004	Sockenkoordinat för Fässberg sn. Se kommentarsfält för mer exakt lokal	378	Match
 Skåne	Skanör		3000	55.41968	12.84994	Sockenkoordinat för Skanör sn. Se kommentarsfält för mer exakt lokal	370	Match
@@ -48,37 +48,34 @@ Lappland						Sverige	369	No match
 Göteborg	Styrsö		10845	57.59320	11.72861	Sockenkoordinat för Styrsö sn. Se kommentarsfält för mer exakt lokal	341	Match
 Västmanland	Hallstahammar		10000	59.59201	16.27229	Sockenkoordinat för Hallstahammar sn. Se kommentarsfält för mer exakt lokal	335	Match
 Ångermanland	Hörnefors	Kylören		63.53708	19.76830		334	Match
-Skåne						Provins	333	No match
-Ångermanland						Provins	326	No match
+Ångermanland			130000	63.69224	 16.90067	Matchning på provins. Koordinatsatt på Junsele kyrka	326	Match
 Gotland		Torsburgen	1000	57.41207	18.71829	Mittpunkt på Torsburgen	318	Match
 Stockholm	Stockholm	Stockholm	50000	59.32206	17.99713	Koordinat för Stockholm på Storkyrkan. Om bara fyndplats Stockholm är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	303	Match
 		Svecia				Sverige	300	No match
-Västmanland						Provins	267	No match
-Pite lappmark						Provins	265	No match
+Västmanland			140000	59.61258	 16.54147	Matchning på provins. Koordinatsatt på Västerås domkyrka	267	Match
+Pite lappmark			130000	66.051939	 17.88438	Matchning på provins. Koordinatsatt på Arjeplog kyrka	265	Match
 Gotland		Gotland				Provins	263	Match-but no coordinates
-Västergötland						Provins	251	No match
 Skåne	Gudmuntorp		6504	55.82774	13.47712	Sockenkoordinat för Gudmundtorp sn. Se kommentarsfält för mer exakt lokal	247	Match
-Gästrikland						Provins	246	No match
-Medelpad						Provins	232	No match
+Gästrikland			70000	60.6727	 17.138071	Matchning på provins. Koordinatsatt på Heliga Trefaldighetskyrkan i Gävle	246	Match
+Medelpad			140000	62.391185	 17.300195	Matchning på provins. Koordinatsatt på Gustaf Adolf kyrka i Sundsvall	232	Match
 Södermanland	Ludgo-Spelvik		30000	58.90945	17.11185	Sockenkoordinat för Ludgo-Spelvik sn. Se kommentarsfält för mer exakt lokal	232	Match
 Södermanland	Kvarsebo		10570	58.64496	16.62594	Sockenkoordinat för Kvarsebo sn. Se kommentarsfält för mer exakt lokal	227	Match
 Dalarna	Hamra		30000	61.65544	14.99552	Sockenkoordinat för Hamra kyrka (Dalarna). Se kommentarsfält för mer exakt lokal	219	Match
-Göteborg			50000	57.70458	11.96527	Koordinat för Göteborg på Gustavi domkyrka. Om bara fyndplats Göteborg är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	212	No match
+Göteborg			50000	57.70458	11.96527	Koordinat för Göteborg på Gustavi domkyrka. Om bara fyndplats Göteborg är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	212	Match
 Småland	Ryssby [Kalmar kommun]		10000	56.80200	16.35101	Sockenkoordinat för Ryssby [Kalmar kommun] sn. Se kommentarsfält för mer exakt lokal	211	Match
 Härjedalen	Ljusnedal		30000	62.53529	12.61148	Sockenkoordinat för Ljusnedal sn. Se kommentarsfält för mer exakt lokal	210	Match
 		in Svecia				Sverige	207	No match
 Skåne		Ringsjön	2000	55.88031	13.50419		203	Match
 Skåne		Lund	5000	55.70409	13.19358	Koordinat på Lunds domkyrka	202	Ambiguous
-Hälsingland						Provins	197	No match
+Hälsingland			150000	61.7262	 17.104565	Matchning på provins. Koordinatsatt på Jakobs kyrka i Hudiksvall	197	Match
 Uppland		Uppsala, Stadsskogen	1000	59.83930	17.62422		190	No match
 Södermanland / Uppland						Provins	188	No match
-Dalsland						Provins	187	No match
-Lycksele lappmark						Provins	185	No match
+Dalsland			70000	58.698979	 12.453797	Matchning på provins. Koordinatsatt på Melleruds kyrka	187	Match
+Lycksele lappmark			160000	65.541832	 17.515312	Matchning på provins. Koordinatsatt på Sorsele kyrka	185	Match
 Bohuslän		Orust	5000	58.17808	11.65670		179	Match
-Västerbotten						Provins	175	No match
-Norrbotten						Provins	165	No match
+Västerbotten			180000	63.82355	 20.26791	Matchning på provins. Koordinatsatt på Umeå stadskyrka	175	Match
+Norrbotten			290000	65.582749	 22.149124	Matchning på provins. Koordinatsatt på Luleå domkyrka	165	Match
 Göteborg	Partille		5988	57.73169	12.12812	Sockenkoordinat för Partille sn. Se kommentarsfält för mer exakt lokal	165	Match
-Uppland						Provins	164	No match
 Göteborg	Nödinge		6809	57.86257	12.05820	Sockenkoordinat för Partille sn. Se kommentarsfält för mer exakt lokal	154	Match
 Uppland	Bondkyrka		5000	59.82108	17.59744	Sockenkoordinat för Bondkyrka sn. Se kommentarsfält för mer exakt lokal	154	Match
 Öland	Bredsättra		4875	56.83494	16.82307	Sockenkoordinat för Bredsättra sn. Se kommentarsfält för mer exakt lokal	150	Match
@@ -90,7 +87,6 @@ Uppland		Uppsala, Carolinaparken	1000	59.85437	17.62921	Mittpunkt för Carolinap
 Göteborg	Askim		6346	57.59416	11.93748	Sockenkoordinat för Askim sn. Se kommentarsfält för mer exakt lokal	125	Match
 Skåne		Skåne, Skäralid	2000	56.03032	 13.23538	Koordinat i Skärån V om Samhället Skäralid	124	No match
 						Oklart var	121	No match
-Bohuslän						Provins	121	No match
 Göteborg	Råda		4632	58.49851	13.08208	Sockenkoordinat för Råda sn. Se kommentarsfält för mer exakt lokal	120	Match
 Uppland		Upland				Provins	117	No match
 Skåne		Malmö					116	Ambiguous
@@ -99,28 +95,22 @@ Göteborg	Angered		5234	57.79410	12.06370	Sockenkoordinat för Angered sn. Se ko
 Gotland		Gottland				Provins	113	No match
 Småland	Voxtorp [Värnamo kommun]		9991	57.10255	14.16389	Sockenkoordinat för Voxtorp [Värnamo kommun] sn. Se kommentarsfält för mer exakt lokal	113	Match
 Uppland		Uppland: Uppsala	6000	59.85813	17.63346	Koordinat för Uppsala domkyrka.	112	No match
-Öland						Provins	110	No match
 Göteborg	Härryda		7178	57.68814	12.33723	Sockenkoordinat för Härryda sn. Se kommentarsfält för mer exakt lokal	106	Match
 Gotland		Torsburg	1000	57.41207	18.71829	Mittpunkt på Torsburgen	105	No match
 Bohuslän		Bohuslän				Provins	104	Match-but no coordinates
-Östergötland						Provins	104	No match
 Småland	Ljungarum		10000	57.75497	14.17641	Sockenkoordinat för Ljungarum sn. Se kommentarsfält för mer exakt lokal	102	Match
 Bohuslän		Bohusl.				Provins	99	No match
 Småland	Ljungby [Ljungby kommun]		10000	56.83435	13.93498	Sockenkoordinat för Ljungby [Ljungby kommun] sn. Se kommentarsfält för mer exakt lokal	98	Match
 Småland	Ryssby					Oklart vilket Ryssby som avses	96	Ambiguous
 Skåne	Gessie						95	Ambiguous
-Gotland						Provins	94	No match
 Gotland	Hörsne med Bara						93	Match-but no coordinates
-Åsele lappmark						Provins	92	No match
+Åsele lappmark			200000	64.16376	17.35509	Matchning på provins. Koordinatsatt på Åsele kyrka	92	Match
 Härjedalen		Herjedalen				Provins	92	No match
-Västerbotten						Provins	92	No match
 Bohuslän		Boh.				Provins	91	No match
 Bohuslän		Bohuslän.				Provins	88	Match-but no coordinates
 Uppland		Uppland, Uppsala	6000	59.85813	17.63346	Koordinat för Uppsala domkyrka.	88	No match
 Göteborg	Örgryte						88	No match
 Göteborg	Landvetter						87	No match
-Småland						Provins	86	No match
-Närke						Provins	86	No match
 Bohuslän / Västergötland						Provins	82	No match
 Skåne		Fågelsång	1000	55.71148	13.32469		80	Match
 Östergötland		Tåkern					79	No match
@@ -138,11 +128,8 @@ Bohuslän		Warholmen.					69	No match
 		e Lapponia				Sverige	68	No match
 Uppland		Uppsala, Slottsbacken					68	No match
 Gotland		Torsborgen	1000	57.41207	18.71829	Mittpunkt på Torsburgen	68	No match
-Södermanland							67	No match
-Lycksele lappmark							67	No match
 Skåne	Maglehem / Åhus						67	No match
 Västergötland		Göteborg, St. Änggården, Naturparken					66	No match
-Jämtland							66	No match
 Östergötland		Östergötland				Provins	63	Match-but no coordinates
 Gästrikland		Gävle					63	Ambiguous
 Uppland		Uppsala, Hort. Bot					63	No match
@@ -151,13 +138,11 @@ Göteborg	Tuve						62	No match
 Jämtland		Jämtland				Provins	61	Match-but no coordinates
 Gotland		Thorsburg	1000	57.41207	18.71829	Mittpunkt på Torsburgen	61	No match
 Bohuslän		Koster	3000	58.88545	11.02363		61	Match
-Torne lappmark						Provins	61	No match
 Jämtland		Åreskutan	4000	63.43119	13.09368		59	Match
 Uppland		Uppsala, Kungsparken					59	No match
 Östergötland		Ög. Omberg	6000	58.33411	14.66662	Socken okänd. Koordinat mittpunkt på Omberg	58	No match
 Gotland		Thorsburgen	1000	57.41207	18.71829	Mittpunkt på Torsburgen	58	No match
 Västergötland		Västergötland, Kinnekulle	7000	58.59791	13.40756	Socken okänd. Koordinat mittpunkt på Kinnekulle, som ligger i Österplana och Medelplana socknar. 	57	No match
-Värmland			7000	58.59791	13.40756	Socken okänd. Koordinat mittpunkt på Kinnekulle, som ligger i Österplana och Medelplana socknar. 	57	No match
 Bohuslän		In mari Bahusiae					56	No match
 Uppland	Stockholms-Näs						56	Match-but no coordinates
 		uppgifter saknas				Oklart var	55	No match
@@ -175,7 +160,6 @@ Halland		Halland				Provins	50	Match-but no coordinates
 		In Suecia				Sverige	50	No match
 Skåne		Krankesjön		55.69595	13.48531		49	Match
 Skåne		Sk.				Provins	47	No match
-Dalarna							47	No match
 Småland	Voxtorp [Kalmar kommun]						45	Ambiguous
 Gotland		Gotland.				Provins	45	Match-but no coordinates
 Södermanland		Södermanland				Provins	45	Match-but no coordinates
@@ -197,7 +181,6 @@ Småland		Ljungby					40	Ambiguous
 Uppland		Upsaliae					40	No match
 Uppland		Uppsala, Norby					39	No match
 Uppland		Uppsala, parken framför fängelset					39	No match
-Medelpad							39	No match
 Bohuslän		Bahusia.					38	No match
 Västergötland		Västergötland, Hunneberg	5000	58.32683	12.45946	Mittpunktkoordinat på Hunneberg. Församling, kommun ej angivet taget från koordinaten.	38	No match
 Västergötland		Västergötland, Mösseberg	4000	58.19722	13.49320	Socken okänd. Koordinat mittpunkt på Mösseberg	38	No match
@@ -218,7 +201,6 @@ Skåne		Sk. Skäralid	2000	56.03032	 13.23538	Koordinat i Skärån V om Samhäll
 Skåne		Scania [Skåne]					34	No match
 Bohuslän		Gullmarsfjorden					34	No match
 Blekinge		Karlskrona, Vämö					34	No match
-Ångermanland							34	No match
 Västergötland		Hornborgasjön					33	No match
 Uppland		Roslagen					33	No match
 Uppland		Upl., ”Erken”, N von Rimbo					33	No match
@@ -233,7 +215,6 @@ Norrbotten		Vuono	1000	65.82992	24.05883		31	Match
 Halland		Halmstad					31	Ambiguous
 Bohuslän		Sydkoster	2000	58.88055	11.03056		31	Match
 Västergötland		Göteborg, Rya skog					31	No match
-Lule lappmark							31	No match
 Västerbotten	Robertsfors						31	Match-but no coordinates
 Skåne	S:t Ibb						31	No match
 Östergötland		Ög., Omberg	6000	58.33411	14.66662	Socken okänd. Koordinat mittpunkt på Omberg	30	No match
@@ -263,7 +244,6 @@ Göteborg		Göteborg					27	No match
 Bohuslän		Uddevalla					27	Ambiguous
 Värmland		Karlstad					27	Ambiguous
 Västergötland		Göteborg, Ringön					27	No match
-Hälsingland							27	No match
 Bohuslän		Bohuslänska skärgården, Gullmartrakten.					26	No match
 Västergötland		Västergötland, Halleberg	4000	58.37995	12.44604	Mittpunktkoordinat på Halleberg. Församling, kommun ej angivet taget från koordinaten.	26	No match
 		Schweden					26	No match
@@ -282,14 +262,11 @@ Västergötland		Västergötl.: Mösseberg.	4000	58.19722	13.49320	Socken okänd
 Uppland		Upl., ”Erken”, N. von Rimbo					25	No match
 		[Missing]					25	No match
 Uppland		Upsalia					25	No match
-Norrbotten							25	No match
-Blekinge							25	No match
 Skåne		Sk. Kullen					24	No match
 Skåne		Sk. Broby					24	No match
 Gotland		Hoburgen	250	56.91894	18.12534		24	Match
 Södermanland		Strängnäs					24	Ambiguous
 Bohuslän		Bahusiae					24	No match
-Västmanland							24	No match
 Södermanland	Enskede						24	Match-but no coordinates
 Gästrikland	Åmot						24	Match-but no coordinates
 Skåne		Kullaberg					23	Ambiguous
@@ -310,7 +287,6 @@ Småland		Kalmar					22	Ambiguous
 Uppland		Uppsala, Lassby					22	No match
 Uppland		Kåbo, Uppsala					22	No match
 Västerbotten		Degerfors					22	Ambiguous
-Härjedalen							22	No match
 Jämtland	Haverö	Kläppberget					22	Ambiguous
 Västergötland	Jonsered		750	57.74495	12.17225		22	Match
 Västergötland		Gisseberget					21	No match
@@ -364,7 +340,6 @@ Skåne		Landskrona					18	Ambiguous
 Skåne		Tommarp	500	56.11914	14.23366		18	Match
 Östergötland		Linköping					18	Ambiguous
 Skåne		Röglan					18	No match
-Åsele lappmark							18	No match
 Blekinge		Blekinge.					17	Match-but no coordinates
 Bohuslän		Koster Bohusiae.					17	No match
 Närke		Närke					17	Match-but no coordinates
@@ -385,7 +360,6 @@ Härjedalen		Fjällnäs		62.59804	12.18404		17	Match
 Uppland		Ultuna	500	59.81582	17.66200		17	Match
 Skåne		[illegible]					17	No match
 Västergötland		Billingen, Skobolidsmossen					17	No match
-Gästrikland							17	No match
 Uppland	Skutskär						17	Match-but no coordinates
 Västmanland	Malma						17	Match-but no coordinates
 Uppland	S:t Per						17	No match
@@ -467,7 +441,6 @@ Uppland		Rydbo	500	59.46121	18.18551		14	Match
 Uppland		Grindstugan, Uppsala					14	No match
 Västergötland		Göteborg, Hort. Botan. Gotoburg					14	No match
 Öland		Gösslunda alvar					14	No match
-Dalsland							14	No match
 Skåne	Tomelilla						14	Match-but no coordinates
 Pite Lappmark	Sorsele						14	No match
 Åsele lappmark		Åsele Lappmark, Tärna parish: SW of the W end of lake Virisen between the road and river Vapstälven (Lok. 88)					13	No match
@@ -521,7 +494,6 @@ Uppland		Uppsala, Grindstugan					12	No match
 Östergötland		Svecia in Omberg	6000	58.33411	14.66662	Socken okänd. Koordinat mittpunkt på Omberg	12	No match
 Södermanland / Uppland		Ad Holmiam					12	No match
 Västergötland		Göteborg, Hedlunds park					12	No match
-Halland							12	No match
 Västmanland	S:t Ilian						12	No match
 Skåne	Husie						12	Ambiguous
 Skåne		Fjällfotasjön					11	No match
@@ -628,7 +600,6 @@ Västergötland		In Mösseberg, in hortis sanatorii					10	No match
 Dalarna		Grycksbo					10	Match-but no coordinates
 Småland		Ryd					10	Ambiguous
 Västergötland		Högstena alvar					10	No match
-Pite lappmark							10	No match
 Göteborg	Mölndal						10	No match
 Lycksele lpm	Tärna						10	No match
 Småland		Småland.					9	Match-but no coordinates
@@ -35176,7 +35147,6 @@ Västergötland	Vassända-naglum	Skärsbo					1	No match
 Västerbotten		Gräsvattnet					1	No match
 Västergötland		Grønbakken					1	No match
 Skåne		Flintrännan					1	Ambiguous
-Västerbotten		 					1	No match
 Småland (Inre)	Visingsö						1	No match
 		Gräsvattnet					1	No match
 Småland (Kalmar)	Kristdala						1	No match
@@ -35290,7 +35260,6 @@ Uppland	Uninge						1	No match
 Härjedalen		Anåfjället					1	Ambiguous
 Bohuslän		Harpö	1000	58.25054	11.35735		1	Match
 Torne lappmark		Hilkojoki		68.41387	22.47338		1	Match
-Bohuslän	 						1	No match
 Härjedalen	Klövsjö						1	No match
 Västergötland	Hjälsta						1	No match
 Jämtland		Jormlifjället					1	No match

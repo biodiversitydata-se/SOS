@@ -463,11 +463,11 @@ public class iNaturalistObservationFactoryTests
     {
         public bool IsInitialized => true;
 
-        public void AddAreaDataToProcessedLocation(Location processedLocation)
+        public void AddAreaDataToProcessedLocation(Location processedLocation, params AreaType[] uncertainAreaTypes)
         {
         }
 
-        public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations)
+        public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations, params AreaType[] uncertainAreaTypes)
         {
         }
 
